@@ -1501,6 +1501,7 @@
             <nav class="menu-links">
                 <a href="#" @click.prevent="menuOpen = false; view = 'list'; fetchList()">Semua Catatan</a>
                 <a href="#" @click.prevent="menuOpen = false; view = 'profile'">Profile</a>
+                <a href="#" @click.prevent="menuOpen = false; view = 'credit'">Credit</a>
             </nav>
             <button class="btn btn-primary btn-block" x-show="!isAuthed" @click="menuOpen = false; goLogin()" style="border-radius:var(--radius-pill);">Masuk</button>
             <button class="btn btn-danger btn-block" x-show="isAuthed" @click="menuOpen = false; logout()" style="border-radius:var(--radius-pill);">Keluar</button>
@@ -1866,6 +1867,26 @@
                 </div>
             </template>
         </section>
+
+      <section x-show="view === 'credit'">
+    <div class="profile-card" style="margin-top:22px;">
+        <div class="profile-avatar" style="background: linear-gradient(135deg, #fef3c7, #fde68a); color: #d97706;">
+            <svg class="icon-svg" style="width:32px;height:32px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+        </div>
+        <h3>Credit</h3>
+        <p style="margin-top:3.5px;"><strong>  Dibuat oleh : </strong></p>
+        <div class="profile-info-list" style="margin-top:7.7px; text-align:left;">
+            <div class="row"><span>Willdan Arsenio R.</span></div>
+            <div class="row"><span>Pratama Wahyu S.</span></div>
+            <div class="row"><span>Abid Rizal K.</span></div>
+        </div>
+      <p style="font-size:13px;color:var(--text-muted);margin-top:4px;">© 2026 Notepad Sharing. All rights reserved.</p>
+    </div>
+</section>
     </main>
 
     <button class="fab" x-show="view === 'list'" @click="view = 'create'; resetForm()" x-transition>
