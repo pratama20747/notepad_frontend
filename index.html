@@ -1527,9 +1527,122 @@
       .topbar-inner {
     position: relative;
       }
+
+      /* ===== Splash Screen ===== */
+      .splash-screen {
+          position: fixed;
+          inset: 0;
+          z-index: 500;
+          background: var(--bg);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 22px;
+          transition: opacity 0.4s ease, visibility 0.4s ease;
+      }
+      .splash-screen.hide {
+          opacity: 0;
+          visibility: hidden;
+          pointer-events: none;
+      }
+      .splash-logo {
+          width: 72px;
+          height: 72px;
+          border-radius: var(--radius);
+          background: linear-gradient(135deg, var(--blue) 0%, #7b6cf6 100%);
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 8px 28px var(--blue-glow);
+          animation: splashPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      @keyframes splashPop {
+          0% { transform: scale(0.6); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
+      }
+      .splash-text {
+          font-size: 17px;
+          font-weight: 750;
+          letter-spacing: -0.02em;
+          color: var(--text);
+      }
+      .splash-progress-track {
+          width: 200px;
+          height: 6px;
+          border-radius: var(--radius-pill);
+          background: var(--blue-light);
+          overflow: hidden;
+      }
+      .splash-progress-fill {
+          height: 100%;
+          border-radius: var(--radius-pill);
+          background: linear-gradient(90deg, var(--blue), #7b6cf6);
+          transition: width 0.35s ease;
+      }
+
+      /* ===== Skeleton loader (note list) ===== */
+      .skeleton-card {
+          background: var(--card);
+          border: 1.5px solid var(--border);
+          border-radius: var(--radius-lg);
+          padding: 20px 22px;
+          position: relative;
+          overflow: hidden;
+      }
+      .skeleton-line {
+          height: 12px;
+          border-radius: 6px;
+          background: var(--border);
+          position: relative;
+          overflow: hidden;
+          margin-bottom: 10px;
+      }
+      .skeleton-line::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+          animation: shimmer 1.4s infinite;
+      }
+      body.dark .skeleton-line::after {
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+      }
+      @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+      }
+      .skeleton-line.short { width: 40%; height: 10px; }
+      .skeleton-line.title { width: 65%; height: 15px; }
+      .skeleton-line.text { width: 90%; }
+      .skeleton-line.text2 { width: 75%; margin-bottom: 0; }
+
+      .section-loading-spin {
+          width: 15px;
+          height: 15px;
+          border: 2px solid var(--blue-light);
+          border-top-color: var(--blue);
+          border-radius: 50%;
+          animation: spin 0.7s linear infinite;
+          display: inline-block;
+      }
+      @keyframes spin {
+          to { transform: rotate(360deg); }
+      }
     </style>
 </head>
 <body x-data="notepadApp()" x-init="init()" :class="{ 'dark': darkMode }">
+    <div class="splash-screen" :class="{ hide: !initialLoading }">
+        <div class="splash-logo">
+            <svg class="icon-svg large" style="color:white;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div class="splash-text">Notepad Sharing</div>
+        <div class="splash-progress-track">
+            <div class="splash-progress-fill" :style="'width:' + initialProgress + '%'"></div>
+        </div>
+    </div>
+
     <header class="topbar">
         <div class="topbar-inner">
             <button class="brand" @click="view = 'home'; fetchRecentPublic()">
@@ -1600,14 +1713,30 @@
             <template x-if="isAuthed">
                 <div>
                     <div class="section-header">
-                        <div><h2>Catatanmu Terbaru</h2><span class="muted" x-text="recentPublic.length + ' catatan publik'"></span></div>
+                        <div>
+                            <h2>Catatanmu Terbaru</h2>
+                            <span class="muted" style="display:flex;align-items:center;gap:6px;">
+                                <span x-show="loadingRecent" class="section-loading-spin"></span>
+                                <span x-text="loadingRecent ? 'Memuat...' : recentPublic.length + ' catatan publik'"></span>
+                            </span>
+                        </div>
                         <a href="#" class="link-action" @click.prevent="goProtected('list')">Lihat semua ›</a>
                     </div>
                     <div class="note-grid">
-                        <template x-if="recentPublic.length === 0">
+                        <template x-if="loadingRecent">
+                            <template x-for="i in 3" :key="'sk-'+i">
+                                <div class="skeleton-card">
+                                    <div class="skeleton-line short"></div>
+                                    <div class="skeleton-line title"></div>
+                                    <div class="skeleton-line text"></div>
+                                    <div class="skeleton-line text2"></div>
+                                </div>
+                            </template>
+                        </template>
+                        <template x-if="!loadingRecent && recentPublic.length === 0">
                             <div class="empty-state">Belum ada catatan publik. Jadilah yang pertama ✨</div>
                         </template>
-                        <template x-for="(n, i) in recentPublic.slice(0,4)" :key="n.id">
+                        <template x-if="!loadingRecent" x-for="(n, i) in recentPublic.slice(0,4)" :key="n.id">
                             <div class="note-card" @click="viewNote(n.id)">
                                 <div class="note-card-top">
                                     <div class="note-icon" x-html="noteIcons[i % noteIcons.length]"></div>
@@ -1741,14 +1870,28 @@
             x-transition:leave-start=""
             x-transition:leave-end="page-section-leave-to">
             <div class="section-header" style="margin-top:22px;">
-                <div><h2>Semua Catatan</h2><span class="muted" x-text="notes.length + ' catatan'"></span></div>
+                <div>
+                    <h2>Semua Catatan</h2>
+                    <span class="muted" style="display:flex;align-items:center;gap:6px;">
+                        <span x-show="loadingList" class="section-loading-spin"></span>
+                        <span x-text="loadingList ? 'Memuat...' : notes.length + ' catatan'"></span>
+                    </span>
+                </div>
                 <button class="btn btn-secondary" @click="view = 'create'; resetForm()">+ Catatan</button>
             </div>
             <div class="note-grid">
-                <template x-if="notes.length === 0">
+                <template x-if="loadingList">
+                    <template x-for="i in 4" :key="'skl-'+i">
+                        <div class="skeleton-card">
+                            <div class="skeleton-line short"></div>
+                            <div class="skeleton-line title"></div>
+                        </div>
+                    </template>
+                </template>
+                <template x-if="!loadingList && notes.length === 0">
                     <div class="empty-state">Belum ada catatan. Buat yang pertama ✍️</div>
                 </template>
-                <template x-for="(n, i) in notes" :key="n.id">
+                <template x-if="!loadingList" x-for="(n, i) in notes" :key="n.id">
                     <div class="note-card" @click="viewNote(n.id)">
                         <div class="note-card-top">
                             <div class="note-icon" x-html="noteIcons[i % noteIcons.length]"></div>
@@ -2062,16 +2205,31 @@
                 loginForm: { email: '', password: '' },
                 registerForm: { email: '', password: '', confirm: '' },
 
+                // ===== state loading baru =====
+                initialLoading: true,
+                initialProgress: 10,
+                loadingRecent: false,
+                loadingList: false,
+
                 get isAuthed() { return !!this.accessToken; },
 
                 async init() {
+                    this.initialProgress = 20;
                     const saved = localStorage.getItem('notepad-theme');
                     this.darkMode = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
                     this.accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
                     this.userEmail = localStorage.getItem(EMAIL_KEY) || '';
+                    this.initialProgress = 45;
                     if (!this.accessToken) await this.silentRefresh();
-                    if (this.handleShareLink()) return;
-                    if (this.view === 'home') this.fetchRecentPublic();
+                    this.initialProgress = 70;
+                    if (this.handleShareLink()) {
+                        this.initialProgress = 100;
+                        setTimeout(() => this.initialLoading = false, 300);
+                        return;
+                    }
+                    if (this.view === 'home') await this.fetchRecentPublic();
+                    this.initialProgress = 100;
+                    setTimeout(() => this.initialLoading = false, 300);
                 },
                 setSession(token, email) {
                     this.accessToken = token;
@@ -2121,8 +2279,40 @@
                 copyToClipboard(text) { if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => this.toast('Link disalin!')).catch(() => this.toast('Gagal menyalin', 'error')); } else { const input = document.createElement('input'); input.value = text; document.body.appendChild(input); input.select(); try { document.execCommand('copy'); this.toast('Link disalin!'); } catch (e) { this.toast('Gagal menyalin', 'error'); } document.body.removeChild(input); } },
                 setMode(mode) { this.form.mode = mode; },
                 resetForm() { this.form = { title: '', content: '', mode: 'public', password: '' }; this.resultNote = null; this.showPassword = false; },
-                async fetchRecentPublic() { if (!this.isAuthed) { this.recentPublic = []; return; } try { const res = await this.authFetch(`${API}?limit=50&offset=0`); const data = await res.json(); if (!res.ok) throw new Error(data.error); this.recentPublic = (data.notes || []).filter(n => n.mode === 'public'); for (let n of this.recentPublic.slice(0, 4)) { try { const r2 = await fetch(`${API}/${n.id}`); const d2 = await r2.json(); n.content = d2.content || ''; } catch (e) { n.content = ''; } } } catch (e) { this.recentPublic = []; if (e.message !== 'belum login') this.toast(e.message, 'error'); } },
-                async fetchList() { if (!this.isAuthed) { this.notes = []; this.goLogin(this.view); return; } try { const res = await this.authFetch(`${API}?limit=20&offset=${this.listOffset}`); const data = await res.json(); if (!res.ok) throw new Error(data.error); this.notes = data.notes || []; } catch (e) { this.notes = []; if (e.message !== 'belum login') this.toast(e.message, 'error'); } },
+                async fetchRecentPublic() {
+                    if (!this.isAuthed) { this.recentPublic = []; return; }
+                    this.loadingRecent = true;
+                    try {
+                        const res = await this.authFetch(`${API}?limit=50&offset=0`);
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error);
+                        this.recentPublic = (data.notes || []).filter(n => n.mode === 'public');
+                        for (let n of this.recentPublic.slice(0, 4)) {
+                            try { const r2 = await fetch(`${API}/${n.id}`); const d2 = await r2.json(); n.content = d2.content || ''; }
+                            catch (e) { n.content = ''; }
+                        }
+                    } catch (e) {
+                        this.recentPublic = [];
+                        if (e.message !== 'belum login') this.toast(e.message, 'error');
+                    } finally {
+                        this.loadingRecent = false;
+                    }
+                },
+                async fetchList() {
+                    if (!this.isAuthed) { this.notes = []; this.goLogin(this.view); return; }
+                    this.loadingList = true;
+                    try {
+                        const res = await this.authFetch(`${API}?limit=20&offset=${this.listOffset}`);
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error);
+                        this.notes = data.notes || [];
+                    } catch (e) {
+                        this.notes = [];
+                        if (e.message !== 'belum login') this.toast(e.message, 'error');
+                    } finally {
+                        this.loadingList = false;
+                    }
+                },
                 nextPage() { this.listOffset += 20; this.fetchList(); },
                 prevPage() { this.listOffset = Math.max(0, this.listOffset - 20); this.fetchList(); },
                 async createNote() { if (!this.isAuthed) return this.goLogin('create'); if (!this.form.content.trim()) return this.toast('Isi catatan tidak boleh kosong', 'error'); if (this.form.mode === 'private' && this.form.password.length < 4) return this.toast('Password minimal 4 karakter', 'error'); this.saving = true; try { const payload = { mode: this.form.mode, title: this.form.title || 'Catatan tanpa judul', content: this.form.content }; if (this.form.mode === 'private') payload.password = this.form.password; const res = await this.authFetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); const data = await res.json(); if (!res.ok) throw new Error(data.error); this.resultNote = data; this.form.title = ''; this.form.content = ''; this.form.password = ''; this.toast('Catatan berhasil dibuat!'); } catch (e) { this.toast(e.message, 'error'); } finally { this.saving = false; } },
@@ -2149,10 +2339,10 @@
                 async deleteNote(id) { if (!confirm('Yakin ingin menghapus catatan ini?')) return; let password = null; try { const res = await fetch(`${API}/${id}`); const data = await res.json(); if (data.locked || data.mode === 'private') { password = prompt('Masukkan password untuk menghapus:'); if (!password) return; } } catch (e) { return this.toast(e.message, 'error'); } try { const res = await this.authFetch(`${API}/${id}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(password ? { password } : {}) }); if (!res.ok) throw new Error((await res.json()).error); this.toast('Catatan berhasil dihapus'); if (this.view === 'list' || this.view === 'share') { this.fetchList(); } else { this.view = 'home'; this.fetchRecentPublic(); } } catch (e) { this.toast(e.message, 'error'); } },
                 shareNote(id) { const url = this.shareUrl(id); if (navigator.share) { navigator.share({ title: 'Notepad Sharing', url }).catch(() => {}); } else { this.copyToClipboard(url); } },
                 handleShareLink() {
-  const match = window.location.pathname.match(/\/n\/([a-zA-Z0-9]+)(?:\/|$)/);
-  if (match) { this.viewNote(match[1]); return true; }
-  return false;
-}
+                    const match = window.location.pathname.match(/\/n\/([a-zA-Z0-9]+)(?:\/|$)/);
+                    if (match) { this.viewNote(match[1]); return true; }
+                    return false;
+                }
             };
         }
     </script>
