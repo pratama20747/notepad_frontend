@@ -2148,7 +2148,11 @@
                 async saveEdit() { const note = this.editingNote; if (!note) return; if (!this.editForm.content.trim()) return this.toast('Isi catatan tidak boleh kosong', 'error'); const payload = { title: this.editForm.title || 'Catatan tanpa judul', content: this.editForm.content }; if (note.mode === 'private') { if (!this.editForm.password) return this.toast('Masukkan password untuk verifikasi', 'error'); payload.password = this.editForm.password; } try { const res = await this.authFetch(`${API}/${note.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); const data = await res.json(); if (!res.ok) throw new Error(data.error); this.toast('Catatan berhasil diupdate!'); this.editingNote = null; this.viewNote(note.id); } catch (e) { this.toast(e.message, 'error'); } },
                 async deleteNote(id) { if (!confirm('Yakin ingin menghapus catatan ini?')) return; let password = null; try { const res = await fetch(`${API}/${id}`); const data = await res.json(); if (data.locked || data.mode === 'private') { password = prompt('Masukkan password untuk menghapus:'); if (!password) return; } } catch (e) { return this.toast(e.message, 'error'); } try { const res = await this.authFetch(`${API}/${id}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(password ? { password } : {}) }); if (!res.ok) throw new Error((await res.json()).error); this.toast('Catatan berhasil dihapus'); if (this.view === 'list' || this.view === 'share') { this.fetchList(); } else { this.view = 'home'; this.fetchRecentPublic(); } } catch (e) { this.toast(e.message, 'error'); } },
                 shareNote(id) { const url = this.shareUrl(id); if (navigator.share) { navigator.share({ title: 'Notepad Sharing', url }).catch(() => {}); } else { this.copyToClipboard(url); } },
-                handleShareLink() { const match = window.location.pathname.match(/^\/n\/([a-zA-Z0-9]+)/); if (match) { this.viewNote(match[1]); return true; } return false; }
+                handleShareLink() {
+  const match = window.location.pathname.match(/\/n\/([a-zA-Z0-9]+)(?:\/|$)/);
+  if (match) { this.viewNote(match[1]); return true; }
+  return false;
+}
             };
         }
     </script>
