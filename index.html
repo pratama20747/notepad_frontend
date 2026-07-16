@@ -1449,6 +1449,72 @@
                 animation: none;
             }
         }
+
+        /* Transisi halaman (fade + slide up) */
+        .page-section-enter-active {
+            transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+        }
+        .page-section-leave-active {
+            transition: opacity 0.2s ease-in, transform 0.2s ease-in;
+        }
+        .page-section-enter-from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .page-section-leave-to {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+      /* Dropdown menu (hamburger) */
+.menu-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 20px;
+    margin-top: 8px;
+    width: 260px;
+    background: var(--card);
+    backdrop-filter: var(--backdrop-blur-heavy);
+    -webkit-backdrop-filter: var(--backdrop-blur-heavy);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    z-index: 100;
+    padding: 12px;
+}
+.dropdown-links {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.dropdown-links a {
+    padding: 12px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 550;
+    color: var(--text-muted);
+    letter-spacing: -0.01em;
+    transition: background 0.2s, color 0.2s;
+}
+.dropdown-links a:hover {
+    background: var(--bg);
+    color: var(--text);
+}
+.dropdown-footer {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-top: 1px solid var(--border);
+}
+.dropdown-email {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    word-break: break-all;
+          }
+      .topbar-inner {
+    position: relative;
+      }
     </style>
 </head>
 <body x-data="notepadApp()" x-init="init()" :class="{ 'dark': darkMode }">
@@ -1464,52 +1530,38 @@
                 <button class="dark-toggle" @click="toggleDark()" aria-label="Ubah tema">
                     <span class="thumb" x-html="darkMode ? moonSVG : sunSVG"></span>
                 </button>
-                <button class="icon-btn" @click="menuOpen = true" aria-label="Menu">
+                <button class="icon-btn" @click="menuOpen = !menuOpen" aria-label="Menu">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
                 </button>
+              <div class="menu-dropdown" x-show="menuOpen" @click.self="menuOpen = false" x-transition>
+    <div class="dropdown-links">
+        <a href="#" @click.prevent="menuOpen = false; view = 'list'; fetchList()">Semua Catatan</a>
+        <a href="#" @click.prevent="menuOpen = false; view = 'profile'">Profile</a>
+        <a href="#" @click.prevent="menuOpen = false; view = 'credit'">Credit</a>
+    </div>
+    <div class="dropdown-footer" x-show="isAuthed">
+        <span class="dropdown-email" x-text="userEmail || 'Akun kamu'"></span>
+        <button class="btn btn-danger btn-block" @click="menuOpen = false; logout()" style="margin-top: 6px; border-radius: 8px;">Keluar</button>
+    </div>
+    <div class="dropdown-footer" x-show="!isAuthed">
+        <button class="btn btn-primary btn-block" @click="menuOpen = false; goLogin()" style="border-radius: 8px;">Masuk</button>
+    </div>
+              </div>
             </div>
         </div>
     </header>
 
-    <div class="menu-overlay" x-show="menuOpen" @click.self="menuOpen = false" x-transition>
-        <div class="menu-panel">
-            <div class="topbar-inner">
-                <div class="brand">
-                    <div class="brand-icon">
-                        <svg class="icon-svg" style="color:white;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                    </div>
-                    <span class="brand-name">Notepad Sharing</span>
-                </div>
-                <div class="topbar-actions">
-                    <button class="dark-toggle" @click="toggleDark()">
-                        <span class="thumb" x-html="darkMode ? moonSVG : sunSVG"></span>
-                    </button>
-                    <button class="icon-btn" @click="menuOpen = false" aria-label="Tutup menu">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
-                    </button>
-                </div>
-            </div>
-            <div class="account-chip" x-show="isAuthed">
-                <div class="avatar-sm">
-                    <svg class="icon-svg small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                </div>
-                <div>
-                    <div class="email" x-text="userEmail || 'Akun kamu'"></div>
-                    <div class="tag">Masuk sebagai</div>
-                </div>
-            </div>
-            <nav class="menu-links">
-                <a href="#" @click.prevent="menuOpen = false; view = 'list'; fetchList()">Semua Catatan</a>
-                <a href="#" @click.prevent="menuOpen = false; view = 'profile'">Profile</a>
-                <a href="#" @click.prevent="menuOpen = false; view = 'credit'">Credit</a>
-            </nav>
-            <button class="btn btn-primary btn-block" x-show="!isAuthed" @click="menuOpen = false; goLogin()" style="border-radius:var(--radius-pill);">Masuk</button>
-            <button class="btn btn-danger btn-block" x-show="isAuthed" @click="menuOpen = false; logout()" style="border-radius:var(--radius-pill);">Keluar</button>
-        </div>
-    </div>
+    
 
     <main class="page">
-        <section x-show="view === 'home'">
+        <!-- Transisi diterapkan ke setiap section dengan x-transition kustom -->
+        <section x-show="view === 'home'"
+            x-transition:enter="page-section-enter-active"
+            x-transition:enter-start="page-section-enter-from"
+            x-transition:enter-end=""
+            x-transition:leave="page-section-leave-active"
+            x-transition:leave-start=""
+            x-transition:leave-end="page-section-leave-to">
             <div class="hero">
                 <span class="hero-badge"><span class="dot"></span> Simple · Fast · Shareable</span>
                 <h1 class="hero-title">Share Notes<br><span class="accent">Instantly</span></h1>
@@ -1572,7 +1624,13 @@
             <p class="footer-note">© 2026 Notepad Sharing — Share Notes Instantly</p>
         </section>
 
-        <section x-show="view === 'create'">
+        <section x-show="view === 'create'"
+            x-transition:enter="page-section-enter-active"
+            x-transition:enter-start="page-section-enter-from"
+            x-transition:enter-end=""
+            x-transition:leave="page-section-leave-active"
+            x-transition:leave-start=""
+            x-transition:leave-end="page-section-leave-to">
             <div class="editor-header">
                 <div class="editor-header-left">
                     <button class="icon-btn" @click="view = 'home'; fetchRecentPublic()">
@@ -1663,8 +1721,13 @@
             </template>
         </section>
 
-        <!-- HALAMAN LIST (NOTES) -->
-        <section x-show="view === 'list'">
+        <section x-show="view === 'list'"
+            x-transition:enter="page-section-enter-active"
+            x-transition:enter-start="page-section-enter-from"
+            x-transition:enter-end=""
+            x-transition:leave="page-section-leave-active"
+            x-transition:leave-start=""
+            x-transition:leave-end="page-section-leave-to">
             <div class="section-header" style="margin-top:22px;">
                 <div><h2>Semua Catatan</h2><span class="muted" x-text="notes.length + ' catatan'"></span></div>
                 <button class="btn btn-secondary" @click="view = 'create'; resetForm()">+ Catatan</button>
@@ -1686,7 +1749,6 @@
                                 </span>
                             </div>
                         </div>
-                        <!-- TIGA TOMBOL AKSI DI BAWAH BADGE -->
                         <div class="note-actions" @click.stop>
                             <button class="btn-action copy" @click="copyToClipboard(shareUrl(n.id))">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Salin
@@ -1715,7 +1777,13 @@
             </div>
         </section>
 
-        <section x-show="view === 'view'">
+        <section x-show="view === 'view'"
+            x-transition:enter="page-section-enter-active"
+            x-transition:enter-start="page-section-enter-from"
+            x-transition:enter-end=""
+            x-transition:leave="page-section-leave-active"
+            x-transition:leave-start=""
+            x-transition:leave-end="page-section-leave-to">
             <div class="editor-header">
                 <div class="editor-header-left">
                     <button class="icon-btn" @click="view = 'home'; fetchRecentPublic()">
@@ -1794,7 +1862,13 @@
             </template>
         </section>
 
-        <section x-show="view === 'login'">
+        <section x-show="view === 'login'"
+            x-transition:enter="page-section-enter-active"
+            x-transition:enter-start="page-section-enter-from"
+            x-transition:enter-end=""
+            x-transition:leave="page-section-leave-active"
+            x-transition:leave-start=""
+            x-transition:leave-end="page-section-leave-to">
             <div class="auth-card">
                 <div class="auth-card-icon">
                     <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
@@ -1815,7 +1889,13 @@
             </div>
         </section>
 
-        <section x-show="view === 'register'">
+        <section x-show="view === 'register'"
+            x-transition:enter="page-section-enter-active"
+            x-transition:enter-start="page-section-enter-from"
+            x-transition:enter-end=""
+            x-transition:leave="page-section-leave-active"
+            x-transition:leave-start=""
+            x-transition:leave-end="page-section-leave-to">
             <div class="auth-card">
                 <div class="auth-card-icon">
                     <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
@@ -1838,7 +1918,13 @@
             </div>
         </section>
 
-        <section x-show="view === 'profile'">
+        <section x-show="view === 'profile'"
+            x-transition:enter="page-section-enter-active"
+            x-transition:enter-start="page-section-enter-from"
+            x-transition:enter-end=""
+            x-transition:leave="page-section-leave-active"
+            x-transition:leave-start=""
+            x-transition:leave-end="page-section-leave-to">
             <template x-if="isAuthed">
                 <div class="profile-card" x-transition>
                     <div class="profile-avatar">
@@ -1846,7 +1932,6 @@
                     </div>
                     <h3 x-text="userEmail || 'Akun kamu'"></h3>
                     <p>Akun kamu di Notepad Sharing. Setiap catatan yang kamu buat tersimpan di sini dan hanya bisa kamu kelola.</p>
-
                     <button class="btn btn-danger btn-block" style="margin-top:20px;border-radius:var(--radius-pill);" @click="logout()">
                         <svg class="icon-svg small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="M15 16l4-4-4-4"/><path d="M19 12H9"/></svg>
                         Keluar
@@ -1868,25 +1953,31 @@
             </template>
         </section>
 
-      <section x-show="view === 'credit'">
-    <div class="profile-card" style="margin-top:22px;">
-        <div class="profile-avatar" style="background: linear-gradient(135deg, #fef3c7, #fde68a); color: #d97706;">
-            <svg class="icon-svg" style="width:32px;height:32px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="2" y1="12" x2="22" y2="12"/>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-            </svg>
-        </div>
-        <h3>Credit</h3>
-        <p style="margin-top:3.5px;"><strong>  Dibuat oleh : </strong></p>
-        <div class="profile-info-list" style="margin-top:7.7px; text-align:left;">
-            <div class="row"><span>Willdan Arsenio R.</span></div>
-            <div class="row"><span>Pratama Wahyu S.</span></div>
-            <div class="row"><span>Abid Rizal K.</span></div>
-        </div>
-      <p style="font-size:13px;color:var(--text-muted);margin-top:4px;">© 2026 Notepad Sharing. All rights reserved.</p>
-    </div>
-</section>
+        <section x-show="view === 'credit'"
+            x-transition:enter="page-section-enter-active"
+            x-transition:enter-start="page-section-enter-from"
+            x-transition:enter-end=""
+            x-transition:leave="page-section-leave-active"
+            x-transition:leave-start=""
+            x-transition:leave-end="page-section-leave-to">
+            <div class="profile-card" style="margin-top:22px;">
+                <div class="profile-avatar" style="background: linear-gradient(135deg, #fef3c7, #fde68a); color: #d97706;">
+                    <svg class="icon-svg" style="width:32px;height:32px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                </div>
+                <h3>Credit</h3>
+                <p style="margin-top:3.5px;"><strong>  Dibuat oleh : </strong></p>
+                <div class="profile-info-list" style="margin-top:7.7px; text-align:left;">
+                    <div class="row"><span>Willdan Arsenio R.</span></div>
+                    <div class="row"><span>Pratama Wahyu S.</span></div>
+                    <div class="row"><span>Abid Rizal K.</span></div>
+                </div>
+                <p style="font-size:13px;color:var(--text-muted);margin-top:4px;">© 2026 Notepad Sharing. All rights reserved.</p>
+            </div>
+        </section>
     </main>
 
     <button class="fab" x-show="view === 'list'" @click="view = 'create'; resetForm()" x-transition>
@@ -1927,7 +2018,7 @@
         const EMAIL_KEY = 'np_email';
 
         function notepadApp() {
-          const BASE_URL = 'https://notepad-sharing-production.up.railway.app';
+            const BASE_URL = 'https://notepad-sharing-production.up.railway.app';
             const API = BASE_URL + '/api/notes';
             return {
                 view: 'home',
@@ -1963,22 +2054,22 @@
                 async init() {
                     const saved = localStorage.getItem('notepad-theme');
                     this.darkMode = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    this.accessToken = sessionStorage.getItem(ACCESS_TOKEN_KEY);
-                    this.userEmail = sessionStorage.getItem(EMAIL_KEY) || '';
+                    this.accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+                    this.userEmail = localStorage.getItem(EMAIL_KEY) || '';
                     if (!this.accessToken) await this.silentRefresh();
                     if (this.handleShareLink()) return;
                     if (this.view === 'home') this.fetchRecentPublic();
                 },
                 setSession(token, email) {
                     this.accessToken = token;
-                    sessionStorage.setItem(ACCESS_TOKEN_KEY, token);
-                    if (email) { this.userEmail = email; sessionStorage.setItem(EMAIL_KEY, email); }
+                    localStorage.setItem(ACCESS_TOKEN_KEY, token);
+                    if (email) { this.userEmail = email; localStorage.setItem(EMAIL_KEY, email); }
                 },
                 clearSession() {
                     this.accessToken = null;
                     this.userEmail = '';
-                    sessionStorage.removeItem(ACCESS_TOKEN_KEY);
-                    sessionStorage.removeItem(EMAIL_KEY);
+                    localStorage.removeItem(ACCESS_TOKEN_KEY);
+                    localStorage.removeItem(EMAIL_KEY);
                 },
                 async silentRefresh() {
                     try {
@@ -2013,9 +2104,7 @@
                 toggleDark() { this.darkMode = !this.darkMode; localStorage.setItem('notepad-theme', this.darkMode ? 'dark' : 'light'); },
                 toast(msg, type = 'success') { this.toastMsg = msg; this.toastType = type; clearTimeout(this._toastTimer); this._toastTimer = setTimeout(() => this.toastMsg = '', 3000); },
                 timeAgo(dateStr) { return dayjs(dateStr).fromNow(); },
-                shareUrl(id) {
-    return BASE_URL + '/n/' + id;
-},
+                shareUrl(id) { return BASE_URL + '/n/' + id; },
                 copyToClipboard(text) { if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => this.toast('Link disalin!')).catch(() => this.toast('Gagal menyalin', 'error')); } else { const input = document.createElement('input'); input.value = text; document.body.appendChild(input); input.select(); try { document.execCommand('copy'); this.toast('Link disalin!'); } catch (e) { this.toast('Gagal menyalin', 'error'); } document.body.removeChild(input); } },
                 setMode(mode) { this.form.mode = mode; },
                 resetForm() { this.form = { title: '', content: '', mode: 'public', password: '' }; this.resultNote = null; this.showPassword = false; },
@@ -2051,11 +2140,11 @@
         }
     </script>
     <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW register failed', err));
-      });
-    }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW register failed', err));
+            });
+        }
     </script>
 </body>
 </html>
