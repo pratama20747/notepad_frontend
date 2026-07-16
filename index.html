@@ -13,6 +13,18 @@
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
     <link rel="apple-touch-icon" href="icons/icon-192.png" />
     <title>Notepad Sharing — Share Notes Instantly</title>
+  <script>
+  // Pulihkan path asli dari redirect 404.html (GitHub Pages SPA trick)
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var redirect = params.get('redirect');
+    if (redirect) {
+      var repoPath = '/notepad_frontend'; // <-- samakan dengan di 404.html
+      var newUrl = repoPath + redirect;
+      window.history.replaceState(null, '', newUrl);
+    }
+  })();
+</script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js">
     </script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js">
