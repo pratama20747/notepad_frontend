@@ -1736,7 +1736,8 @@
                         <template x-if="!loadingRecent && recentPublic.length === 0">
                             <div class="empty-state">Belum ada catatan publik. Jadilah yang pertama ✨</div>
                         </template>
-                        <template x-if="!loadingRecent" x-for="(n, i) in recentPublic.slice(0,4)" :key="n.id">
+                        <template x-if="!loadingRecent">
+                          <template x-for="(n, i) in recentPublic.slice(0,4)" :key="n.id">
                             <div class="note-card" @click="viewNote(n.id)">
                                 <div class="note-card-top">
                                     <div class="note-icon" x-html="noteIcons[i % noteIcons.length]"></div>
@@ -1758,6 +1759,7 @@
                                     <span x-text="(n.content?.trim().split(/\s+/).filter(Boolean).length || 0) + ' kata'"></span>
                                 </div>
                             </div>
+                          </template>
                         </template>
                     </div>
                 </div>
@@ -1891,7 +1893,8 @@
                 <template x-if="!loadingList && notes.length === 0">
                     <div class="empty-state">Belum ada catatan. Buat yang pertama ✍️</div>
                 </template>
-                <template x-if="!loadingList" x-for="(n, i) in notes" :key="n.id">
+                <template x-if="!loadingList">
+                  <template x-for="(n, i) in notes" :key="n.id">
                     <div class="note-card" @click="viewNote(n.id)">
                         <div class="note-card-top">
                             <div class="note-icon" x-html="noteIcons[i % noteIcons.length]"></div>
@@ -1924,6 +1927,7 @@
                             <span></span>
                         </div>
                     </div>
+                  </template>
                 </template>
             </div>
             <div class="pagination" x-show="listOffset > 0 || notes.length >= 20">
