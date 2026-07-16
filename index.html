@@ -2018,7 +2018,8 @@
         const EMAIL_KEY = 'np_email';
 
         function notepadApp() {
-            const BASE_URL = 'https://notepad-sharing-production.up.railway.app';
+            const BASE_URL = 'https://notepad-sharing-production.up.railway.app'; // untuk API
+          const FRONTEND_URL = 'https://pratama20747.github.io/notepad_frontend'; // untuk share link
             const API = BASE_URL + '/api/notes';
             return {
                 view: 'home',
@@ -2104,7 +2105,7 @@
                 toggleDark() { this.darkMode = !this.darkMode; localStorage.setItem('notepad-theme', this.darkMode ? 'dark' : 'light'); },
                 toast(msg, type = 'success') { this.toastMsg = msg; this.toastType = type; clearTimeout(this._toastTimer); this._toastTimer = setTimeout(() => this.toastMsg = '', 3000); },
                 timeAgo(dateStr) { return dayjs(dateStr).fromNow(); },
-                shareUrl(id) { return BASE_URL + '/n/' + id; },
+                shareUrl(id) { return FRONTEND_URL + '/n/' + id; },
                 copyToClipboard(text) { if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => this.toast('Link disalin!')).catch(() => this.toast('Gagal menyalin', 'error')); } else { const input = document.createElement('input'); input.value = text; document.body.appendChild(input); input.select(); try { document.execCommand('copy'); this.toast('Link disalin!'); } catch (e) { this.toast('Gagal menyalin', 'error'); } document.body.removeChild(input); } },
                 setMode(mode) { this.form.mode = mode; },
                 resetForm() { this.form = { title: '', content: '', mode: 'public', password: '' }; this.resultNote = null; this.showPassword = false; },
