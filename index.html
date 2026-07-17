@@ -2175,6 +2175,7 @@
 
         const ACCESS_TOKEN_KEY = 'np_access_token';
         const EMAIL_KEY = 'np_email';
+        const REFRESH_TOKEN_KEY = 'np_refresh_token';
 
         function notepadApp() {
             const BASE_URL = 'https://notepad-sharing-production.up.railway.app'; // untuk API
@@ -2203,6 +2204,7 @@
                 sunSVG,
                 moonSVG,
                 accessToken: null,
+                refreshToken: null,
                 userEmail: '',
                 authLoading: false,
                 authRedirectView: null,
@@ -2222,7 +2224,8 @@
                     const saved = localStorage.getItem('notepad-theme');
                     this.darkMode = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
                     this.accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
-                    this.userEmail = localStorage.getItem(EMAIL_KEY) || '';
+this.refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY) || null;
+this.userEmail = localStorage.getItem(EMAIL_KEY) || '';
                     this.initialProgress = 45;
                     if (!this.accessToken) await this.silentRefresh();
                     this.initialProgress = 70;
@@ -2235,26 +2238,43 @@
                     this.initialProgress = 100;
                     setTimeout(() => this.initialLoading = false, 300);
                 },
-                setSession(token, email) {
-                    this.accessToken = token;
-                    localStorage.setItem(ACCESS_TOKEN_KEY, token);
-                    if (email) { this.userEmail = email; localStorage.setItem(EMAIL_KEY, email); }
-                },
+                setSession(accessToken, refreshToken, email) {
+    this.accessToken = accessToken;
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+    if (refreshToken) {
+        this.refreshToken = refreshToken;
+        localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+    }
+    if (email) {
+        this.userEmail = email;
+        localStorage.setItem(EMAIL_KEY, email);
+    }
+},
                 clearSession() {
-                    this.accessToken = null;
-                    this.userEmail = '';
-                    localStorage.removeItem(ACCESS_TOKEN_KEY);
-                    localStorage.removeItem(EMAIL_KEY);
-                },
+    this.accessToken = null;
+    this.refreshToken = null;
+    this.userEmail = '';
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+    localStorage.removeItem(EMAIL_KEY);
+},
                 async silentRefresh() {
-                    try {
-                        const res = await fetch(BASE_URL + '/api/auth/refresh', { method: 'POST', credentials: 'same-origin' });
-                        if (!res.ok) return null;
-                        const data = await res.json();
-                        this.setSession(data.access_token);
-                        return data.access_token;
-                    } catch (e) { return null; }
-                },
+    if (!this.refreshToken) return null;
+    try {
+        const res = await fetch(BASE_URL + '/api/auth/refresh', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token: this.refreshToken })
+        });
+        if (!res.ok) throw new Error('Refresh failed');
+        const data = await res.json();
+        this.setSession(data.access_token, data.refresh_token);
+        return data.access_token;
+    } catch (e) {
+        this.clearSession();
+        return null;
+    }
+},
                 async authFetch(url, options = {}) {
                     let token = this.accessToken;
                     if (!token) token = await this.silentRefresh();
@@ -2273,9 +2293,25 @@
                 goRegister(redirectView = null) { this.authRedirectView = redirectView; this.registerForm = { email: '', password: '', confirm: '' }; this.view = 'register'; },
                 goProtected(targetView) { if (!this.isAuthed) { this.goLogin(targetView); return; } this.view = targetView; if (targetView === 'list' || targetView === 'share') this.fetchList(); },
                 afterAuthSuccess() { const target = this.authRedirectView || 'home'; this.authRedirectView = null; this.view = target; if (target === 'home') this.fetchRecentPublic(); if (target === 'list' || target === 'share') this.fetchList(); },
-                async submitLogin() { const email = this.loginForm.email.trim(); const password = this.loginForm.password; if (!email || !password) return this.toast('Isi email dan password terlebih dahulu', 'error'); this.authLoading = true; try { const res = await fetch(BASE_URL + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ email, password }) }); const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Gagal masuk'); this.setSession(data.access_token, email); this.toast('Berhasil masuk!'); this.afterAuthSuccess(); } catch (e) { this.toast(e.message, 'error'); } finally { this.authLoading = false; } },
-                async submitRegister() { const email = this.registerForm.email.trim(); const password = this.registerForm.password; const confirm = this.registerForm.confirm; if (!email || !password) return this.toast('Isi email dan password terlebih dahulu', 'error'); if (password.length < 8) return this.toast('Password minimal 8 karakter', 'error'); if (password !== confirm) return this.toast('Konfirmasi password tidak cocok', 'error'); this.authLoading = true; try { const res = await fetch(BASE_URL + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ email, password }) }); const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Gagal mendaftar'); this.setSession(data.access_token, email); this.toast('Akun berhasil dibuat!'); this.afterAuthSuccess(); } catch (e) { this.toast(e.message, 'error'); } finally { this.authLoading = false; } },
-                async logout() { try { await fetch(BASE_URL + '/api/auth/logout', { method: 'POST', credentials: 'same-origin' }); } catch (e) {} this.clearSession(); this.recentPublic = []; this.notes = []; this.menuOpen = false; this.toast('Berhasil keluar'); this.view = 'home'; },
+                async submitLogin() { const email = this.loginForm.email.trim(); const password = this.loginForm.password; if (!email || !password) return this.toast('Isi email dan password terlebih dahulu', 'error'); this.authLoading = true; try { const res = await fetch(BASE_URL + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) }); const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Gagal masuk'); this.setSession(data.access_token, data.refresh_token, email); this.toast('Berhasil masuk!'); this.afterAuthSuccess(); } catch (e) { this.toast(e.message, 'error'); } finally { this.authLoading = false; } },
+                async submitRegister() { const email = this.registerForm.email.trim(); const password = this.registerForm.password; const confirm = this.registerForm.confirm; if (!email || !password) return this.toast('Isi email dan password terlebih dahulu', 'error'); if (password.length < 8) return this.toast('Password minimal 8 karakter', 'error'); if (password !== confirm) return this.toast('Konfirmasi password tidak cocok', 'error'); this.authLoading = true; try { const res = await fetch(BASE_URL + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) }); const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Gagal mendaftar'); this.setSession(data.access_token, data.refresh_token, email); this.toast('Akun berhasil dibuat!'); this.afterAuthSuccess(); } catch (e) { this.toast(e.message, 'error'); } finally { this.authLoading = false; } },
+                async logout() {
+    try {
+        if (this.refreshToken) {
+            await fetch(BASE_URL + '/api/auth/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refresh_token: this.refreshToken })
+            });
+        }
+    } catch (e) {}
+    this.clearSession();
+    this.recentPublic = [];
+    this.notes = [];
+    this.menuOpen = false;
+    this.toast('Berhasil keluar');
+    this.view = 'home';
+},
                 toggleDark() { this.darkMode = !this.darkMode; localStorage.setItem('notepad-theme', this.darkMode ? 'dark' : 'light'); },
                 toast(msg, type = 'success') { this.toastMsg = msg; this.toastType = type; clearTimeout(this._toastTimer); this._toastTimer = setTimeout(() => this.toastMsg = '', 3000); },
                 timeAgo(dateStr) { return dayjs(dateStr).fromNow(); },
