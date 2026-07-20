@@ -2289,16 +2289,6 @@
                             this.initialLoading = false;
                         }, 800);
                     }
-                  // setelah splash, coba ambil data user via cookie
-try {
-    const user = await this.fetchMe(); // fetchMe harus menggunakan credentials: 'include'
-    if (user && user.email) {
-        this.setSession(user.access_token, user.email);
-        // lanjutkan ke halaman yang sesuai
-    }
-} catch (e) {
-    // tidak login, lanjutkan seperti biasa
-}
                 },
                 setSession(accessToken, email) {
     this.accessToken = accessToken;
@@ -2345,24 +2335,7 @@ try {
                     }
                     return res;
                 },
-                async fetchMe() {
-                    try {
-                        const res = await fetch(BASE_URL + '/api/auth/me', {
-                            credentials: 'include'
-                        });
-                        if (!res.ok) throw new Error('Unauthorized');
-                        const data = await res.json();
-                        this.userEmail = data.email;
-                        localStorage.setItem(EMAIL_KEY, data.email);
-                        if (data.access_token) {
-                            this.setSession(data.access_token, data.email);
-                        }
-                        return data;
-                    } catch (e) {
-                        this.clearSession();
-                        throw e;
-                    }
-                },
+                
                 requireLogin() { this.clearSession(); this.toast('Masuk dulu untuk melanjutkan', 'error'); this.view = 'login'; },
                 goLogin(redirectView = null) { this.authRedirectView = redirectView; this.loginForm = { email: '', password: '' }; this.view = 'login'; },
                 goRegister(redirectView = null) { this.authRedirectView = redirectView; this.registerForm = { email: '', password: '', confirm: '' }; this.view = 'register'; },
@@ -2527,22 +2500,23 @@ try {
                     return false;
                 },
                 handleAuthCallback() {
-                    if (window.location.pathname.endsWith('/auth/callback')) {
-                        this.fetchMe()
-                            .then(() => {
-                                this.toast('Berhasil masuk dengan Google!', 'success');
-                                window.history.replaceState(null, '', '/');
-                                this.view = 'home';
-                                this.fetchRecentPublic();
-                            })
-                            .catch(() => {
-                                this.toast('Gagal mengambil data akun', 'error');
-                                this.view = 'login';
-                            });
-                        return true;
-                    }
-                    return false;
-                }
+    if (window.location.pathname.endsWith('/auth/callback')) {
+        this.silentRefresh()
+            .then(accessToken => {
+                if (!accessToken) throw new Error('No token');
+                this.toast('Berhasil masuk dengan Google!', 'success');
+                window.history.replaceState(null, '', '/');
+                this.view = 'home';
+                this.fetchRecentPublic();
+            })
+            .catch(() => {
+                this.toast('Gagal mengambil data akun', 'error');
+                this.view = 'login';
+            });
+        return true;
+    }
+    return false;
+}
             };
         }
     </script>
