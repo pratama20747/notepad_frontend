@@ -2114,7 +2114,7 @@
                         <svg class="icon-svg" style="width:32px;height:32px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     </div>
                     <h3 x-text="userEmail || 'Akun kamu'"></h3>
-                    <p>Akun kamu di Notepad Sharing. Setiap catatan yang kamu buat tersimpan di sini dan hanya bisa kamu kelola.</p>
+                    <p>Akun kamu di Notepad Sharing. Setiap catatan yang kamu buat tersimpan di sini dan hanya bisa kamu kelola.</p>0
                     <button class="btn btn-danger btn-block" style="margin-top:20px;border-radius:var(--radius-pill);" @click="logout()">
                         <svg class="icon-svg small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="M15 16l4-4-4-4"/><path d="M19 12H9"/></svg>
                         Keluar
@@ -2199,7 +2199,6 @@
 
         const ACCESS_TOKEN_KEY = 'np_access_token';
         const EMAIL_KEY = 'np_email';
-        const REFRESH_TOKEN_KEY = 'np_refresh_token';
 
         function notepadApp() {
             const BASE_URL = 'https://notepad-sharing-production.up.railway.app'; // untuk API
@@ -2228,7 +2227,6 @@
                 sunSVG,
                 moonSVG,
                 accessToken: null,
-                refreshToken: null,
                 userEmail: '',
                 authLoading: false,
                 googleLoading: false,
@@ -2263,7 +2261,6 @@
 
                         try {
                             this.accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
-                            this.refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY) || null;
                             this.userEmail = localStorage.getItem(EMAIL_KEY) || '';
                         } catch (storageError) {
                             console.warn('localStorage tidak tersedia:', storageError);
@@ -2292,44 +2289,49 @@
                             this.initialLoading = false;
                         }, 800);
                     }
+                  // setelah splash, coba ambil data user via cookie
+try {
+    const user = await this.fetchMe(); // fetchMe harus menggunakan credentials: 'include'
+    if (user && user.email) {
+        this.setSession(user.access_token, user.email);
+        // lanjutkan ke halaman yang sesuai
+    }
+} catch (e) {
+    // tidak login, lanjutkan seperti biasa
+}
                 },
-                setSession(accessToken, refreshToken, email) {
-                    this.accessToken = accessToken;
-                    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-                    if (refreshToken) {
-                        this.refreshToken = refreshToken;
-                        localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-                    }
-                    if (email) {
-                        this.userEmail = email;
-                        localStorage.setItem(EMAIL_KEY, email);
-                    }
-                },
+                setSession(accessToken, email) {
+    this.accessToken = accessToken;
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+    if (email) {
+        this.userEmail = email;
+        localStorage.setItem(EMAIL_KEY, email);
+    }
+    // refresh token tidak disimpan di localStorage
+},
                 clearSession() {
-                    this.accessToken = null;
-                    this.refreshToken = null;
-                    this.userEmail = '';
-                    localStorage.removeItem(ACCESS_TOKEN_KEY);
-                    localStorage.removeItem(REFRESH_TOKEN_KEY);
-                    localStorage.removeItem(EMAIL_KEY);
-                },
+    this.accessToken = null;
+    this.userEmail = '';
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(EMAIL_KEY);
+    // tidak ada refresh token di localStorage
+},
                 async silentRefresh() {
-                    if (!this.refreshToken) return null;
-                    try {
-                        const res = await fetch(BASE_URL + '/api/auth/refresh', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ refresh_token: this.refreshToken })
-                        });
-                        if (!res.ok) throw new Error('Refresh failed');
-                        const data = await res.json();
-                        this.setSession(data.access_token, data.refresh_token);
-                        return data.access_token;
-                    } catch (e) {
-                        this.clearSession();
-                        return null;
-                    }
-                },
+    try {
+        const res = await fetch(BASE_URL + '/api/auth/refresh', {
+            method: 'POST',
+            credentials: 'include', // kirim cookie httpOnly
+        });
+        if (!res.ok) throw new Error('Refresh failed');
+        const data = await res.json();
+        // Hanya simpan access_token dan email (refresh token tetap di cookie)
+        this.setSession(data.access_token, data.email);
+        return data.access_token;
+    } catch (e) {
+        this.clearSession();
+        return null;
+    }
+},
                 async authFetch(url, options = {}) {
                     let token = this.accessToken;
                     if (!token) token = await this.silentRefresh();
@@ -2353,7 +2355,7 @@
                         this.userEmail = data.email;
                         localStorage.setItem(EMAIL_KEY, data.email);
                         if (data.access_token) {
-                            this.setSession(data.access_token, null, data.email);
+                            this.setSession(data.access_token, data.email);
                         }
                         return data;
                     } catch (e) {
@@ -2368,7 +2370,7 @@
                 afterAuthSuccess() { const target = this.authRedirectView || 'home'; this.authRedirectView = null; this.view = target; if (target === 'home') this.fetchRecentPublic(); if (target === 'list' || target === 'share') this.fetchList(); },
                 async submitLogin() {
                     const email = this.loginForm.email.trim();
-                    const password = this.loginForm.password;
+                    const password = this.loginForm.password; 
                     if (!email || !password) return this.toast('Isi email dan password terlebih dahulu', 'error');
                     this.authLoading = true;
                     let data;
@@ -2380,7 +2382,7 @@
                         });
                         data = await res.json();
                         if (!res.ok) throw new Error(data.error || 'Gagal masuk');
-                        this.setSession(data.access_token, data.refresh_token, email);
+                        this.setSession(data.access_token, email);
                         this.toast('Berhasil masuk!');
                         this.afterAuthSuccess();
                     } catch (e) {
@@ -2416,7 +2418,7 @@
                             return;
                         }
                         if (!res.ok) throw new Error(data.error || 'Gagal mendaftar');
-                        this.setSession(data.access_token, data.refresh_token, email);
+                        this.setSession(data.access_token, email);
                         this.toast('Akun berhasil dibuat!');
                         this.afterAuthSuccess();
                     } catch (e) {
@@ -2426,22 +2428,19 @@
                     }
                 },
                 async logout() {
-                    try {
-                        if (this.refreshToken) {
-                            await fetch(BASE_URL + '/api/auth/logout', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ refresh_token: this.refreshToken })
-                            });
-                        }
-                    } catch (e) {}
-                    this.clearSession();
-                    this.recentPublic = [];
-                    this.notes = [];
-                    this.menuOpen = false;
-                    this.toast('Berhasil keluar');
-                    this.view = 'home';
-                },
+    try {
+        await fetch(BASE_URL + '/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include',
+        });
+    } catch (e) {}
+    this.clearSession();
+    this.recentPublic = [];
+    this.notes = [];
+    this.menuOpen = false;
+    this.toast('Berhasil keluar');
+    this.view = 'home';
+},
                 toggleDark() { this.darkMode = !this.darkMode; localStorage.setItem('notepad-theme', this.darkMode ? 'dark' : 'light'); },
                 toast(msg, type = 'success') { this.toastMsg = msg; this.toastType = type; clearTimeout(this._toastTimer); this._toastTimer = setTimeout(() => this.toastMsg = '', 3000); },
                 loginWithGoogle() {
