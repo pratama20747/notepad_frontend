@@ -2043,6 +2043,18 @@
                         <span x-text="authLoading ? 'Memproses...' : 'Masuk'"></span>
                     </button>
                 </div>
+                <div class="btn-group" style="justify-content:center; margin-top: 12px;">
+    <button class="btn btn-secondary" @click="loginWithGoogle()" :disabled="googleLoading" style="background: #fff; color: #444; border: 1px solid #ccc; border-radius: var(--radius-pill);">
+        <!-- SVG Logo Google -->
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+            <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
+            <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+        </svg>
+        <span x-text="googleLoading ? 'Mengalihkan...' : 'Login dengan Google'"></span>
+    </button>
+</div>
                 <div class="auth-switch">Belum punya akun? <a @click="goRegister(authRedirectView)">Daftar sekarang</a></div>
                 <div class="auth-switch"><a @click="view = 'home'">← Kembali ke beranda</a></div>
             </div>
@@ -2072,6 +2084,18 @@
                         <span x-text="authLoading ? 'Memproses...' : 'Daftar'"></span>
                     </button>
                 </div>
+                <div class="btn-group" style="justify-content:center; margin-top: 12px;">
+    <button class="btn btn-secondary" @click="loginWithGoogle()" :disabled="googleLoading" style="background: #fff; color: #444; border: 1px solid #ccc; border-radius: var(--radius-pill);">
+        <!-- SVG Logo Google (sama seperti di atas) -->
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+            <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
+            <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+        </svg>
+        <span x-text="googleLoading ? 'Mengalihkan...' : 'Daftar dengan Google'"></span>
+    </button>
+</div>
                 <div class="auth-switch">Sudah punya akun? <a @click="goLogin(authRedirectView)">Masuk di sini</a></div>
                 <div class="auth-switch"><a @click="view = 'home'">← Kembali ke beranda</a></div>
             </div>
@@ -2207,6 +2231,7 @@
                 refreshToken: null,
                 userEmail: '',
                 authLoading: false,
+                googleLoading: false,
                 authRedirectView: null,
                 loginForm: { email: '', password: '' },
                 registerForm: { email: '', password: '', confirm: '' },
@@ -2220,61 +2245,91 @@
                 get isAuthed() { return !!this.accessToken; },
 
                 async init() {
-                    this.initialProgress = 20;
-                    const saved = localStorage.getItem('notepad-theme');
-                    this.darkMode = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    this.accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
-this.refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY) || null;
-this.userEmail = localStorage.getItem(EMAIL_KEY) || '';
-                    this.initialProgress = 45;
-                    if (!this.accessToken) await this.silentRefresh();
-                    this.initialProgress = 70;
-                    if (this.handleShareLink()) {
+                    // === PERBAIKAN UTAMA: init tidak akan stuck ===
+                    clearTimeout(this._splashTimer); // bersihkan timer sebelumnya
+                    const finishSplash = () => {
                         this.initialProgress = 100;
-                        setTimeout(() => this.initialLoading = false, 300);
-                        return;
+                        // fallback: hilangkan splash paling lambat 1 detik setelah selesai
+                        clearTimeout(this._splashTimer);
+                        this._splashTimer = setTimeout(() => {
+                            this.initialLoading = false;
+                        }, 500);
+                    };
+
+                    try {
+                        this.initialProgress = 20;
+                        const saved = localStorage.getItem('notepad-theme');
+                        this.darkMode = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+                        try {
+                            this.accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+                            this.refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY) || null;
+                            this.userEmail = localStorage.getItem(EMAIL_KEY) || '';
+                        } catch (storageError) {
+                            console.warn('localStorage tidak tersedia:', storageError);
+                        }
+
+                        this.initialProgress = 45;
+                        if (!this.accessToken) await this.silentRefresh();
+                        this.initialProgress = 70;
+
+                        if (this.handleShareLink()) {
+                            finishSplash();
+                            return;
+                        }
+                        if (this.handleAuthCallback()) {
+                            finishSplash();
+                            return;
+                        }
+                        if (this.view === 'home') await this.fetchRecentPublic();
+                        finishSplash();
+                    } catch (e) {
+                        console.error('Gagal inisialisasi:', e);
+                        this.initialProgress = 100;
+                        this.toast('Terjadi masalah saat memuat data', 'error');
+                        // fallback tetap hilangkan splash
+                        this._splashTimer = setTimeout(() => {
+                            this.initialLoading = false;
+                        }, 800);
                     }
-                    if (this.view === 'home') await this.fetchRecentPublic();
-                    this.initialProgress = 100;
-                    setTimeout(() => this.initialLoading = false, 300);
                 },
                 setSession(accessToken, refreshToken, email) {
-    this.accessToken = accessToken;
-    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-    if (refreshToken) {
-        this.refreshToken = refreshToken;
-        localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-    }
-    if (email) {
-        this.userEmail = email;
-        localStorage.setItem(EMAIL_KEY, email);
-    }
-},
+                    this.accessToken = accessToken;
+                    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+                    if (refreshToken) {
+                        this.refreshToken = refreshToken;
+                        localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+                    }
+                    if (email) {
+                        this.userEmail = email;
+                        localStorage.setItem(EMAIL_KEY, email);
+                    }
+                },
                 clearSession() {
-    this.accessToken = null;
-    this.refreshToken = null;
-    this.userEmail = '';
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem(EMAIL_KEY);
-},
+                    this.accessToken = null;
+                    this.refreshToken = null;
+                    this.userEmail = '';
+                    localStorage.removeItem(ACCESS_TOKEN_KEY);
+                    localStorage.removeItem(REFRESH_TOKEN_KEY);
+                    localStorage.removeItem(EMAIL_KEY);
+                },
                 async silentRefresh() {
-    if (!this.refreshToken) return null;
-    try {
-        const res = await fetch(BASE_URL + '/api/auth/refresh', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refresh_token: this.refreshToken })
-        });
-        if (!res.ok) throw new Error('Refresh failed');
-        const data = await res.json();
-        this.setSession(data.access_token, data.refresh_token);
-        return data.access_token;
-    } catch (e) {
-        this.clearSession();
-        return null;
-    }
-},
+                    if (!this.refreshToken) return null;
+                    try {
+                        const res = await fetch(BASE_URL + '/api/auth/refresh', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ refresh_token: this.refreshToken })
+                        });
+                        if (!res.ok) throw new Error('Refresh failed');
+                        const data = await res.json();
+                        this.setSession(data.access_token, data.refresh_token);
+                        return data.access_token;
+                    } catch (e) {
+                        this.clearSession();
+                        return null;
+                    }
+                },
                 async authFetch(url, options = {}) {
                     let token = this.accessToken;
                     if (!token) token = await this.silentRefresh();
@@ -2288,32 +2343,115 @@ this.userEmail = localStorage.getItem(EMAIL_KEY) || '';
                     }
                     return res;
                 },
+                async fetchMe() {
+                    try {
+                        const res = await fetch(BASE_URL + '/api/auth/me', {
+                            credentials: 'include'
+                        });
+                        if (!res.ok) throw new Error('Unauthorized');
+                        const data = await res.json();
+                        this.userEmail = data.email;
+                        localStorage.setItem(EMAIL_KEY, data.email);
+                        if (data.access_token) {
+                            this.setSession(data.access_token, null, data.email);
+                        }
+                        return data;
+                    } catch (e) {
+                        this.clearSession();
+                        throw e;
+                    }
+                },
                 requireLogin() { this.clearSession(); this.toast('Masuk dulu untuk melanjutkan', 'error'); this.view = 'login'; },
                 goLogin(redirectView = null) { this.authRedirectView = redirectView; this.loginForm = { email: '', password: '' }; this.view = 'login'; },
                 goRegister(redirectView = null) { this.authRedirectView = redirectView; this.registerForm = { email: '', password: '', confirm: '' }; this.view = 'register'; },
                 goProtected(targetView) { if (!this.isAuthed) { this.goLogin(targetView); return; } this.view = targetView; if (targetView === 'list' || targetView === 'share') this.fetchList(); },
                 afterAuthSuccess() { const target = this.authRedirectView || 'home'; this.authRedirectView = null; this.view = target; if (target === 'home') this.fetchRecentPublic(); if (target === 'list' || target === 'share') this.fetchList(); },
-                async submitLogin() { const email = this.loginForm.email.trim(); const password = this.loginForm.password; if (!email || !password) return this.toast('Isi email dan password terlebih dahulu', 'error'); this.authLoading = true; try { const res = await fetch(BASE_URL + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) }); const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Gagal masuk'); this.setSession(data.access_token, data.refresh_token, email); this.toast('Berhasil masuk!'); this.afterAuthSuccess(); } catch (e) { this.toast(e.message, 'error'); } finally { this.authLoading = false; } },
-                async submitRegister() { const email = this.registerForm.email.trim(); const password = this.registerForm.password; const confirm = this.registerForm.confirm; if (!email || !password) return this.toast('Isi email dan password terlebih dahulu', 'error'); if (password.length < 8) return this.toast('Password minimal 8 karakter', 'error'); if (password !== confirm) return this.toast('Konfirmasi password tidak cocok', 'error'); this.authLoading = true; try { const res = await fetch(BASE_URL + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) }); const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Gagal mendaftar'); this.setSession(data.access_token, data.refresh_token, email); this.toast('Akun berhasil dibuat!'); this.afterAuthSuccess(); } catch (e) { this.toast(e.message, 'error'); } finally { this.authLoading = false; } },
+                async submitLogin() {
+                    const email = this.loginForm.email.trim();
+                    const password = this.loginForm.password;
+                    if (!email || !password) return this.toast('Isi email dan password terlebih dahulu', 'error');
+                    this.authLoading = true;
+                    let data;
+                    try {
+                        const res = await fetch(BASE_URL + '/api/auth/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, password })
+                        });
+                        data = await res.json();
+                        if (!res.ok) throw new Error(data.error || 'Gagal masuk');
+                        this.setSession(data.access_token, data.refresh_token, email);
+                        this.toast('Berhasil masuk!');
+                        this.afterAuthSuccess();
+                    } catch (e) {
+                        if (data && data.error && data.error.includes('Google')) {
+                            this.toast('Akun ini hanya terdaftar via Google. Silakan login dengan tombol "Login dengan Google".', 'error');
+                        } else {
+                            this.toast(e.message || 'Gagal masuk', 'error');
+                        }
+                    } finally {
+                        this.authLoading = false;
+                    }
+                },
+                async submitRegister() {
+                    const email = this.registerForm.email.trim();
+                    const password = this.registerForm.password;
+                    const confirm = this.registerForm.confirm;
+                    if (!email || !password) return this.toast('Isi email dan password terlebih dahulu', 'error');
+                    if (password.length < 8) return this.toast('Password minimal 8 karakter', 'error');
+                    if (password !== confirm) return this.toast('Konfirmasi password tidak cocok', 'error');
+                    this.authLoading = true;
+                    let data;
+                    try {
+                        const res = await fetch(BASE_URL + '/api/auth/register', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, password })
+                        });
+                        data = await res.json();
+                        if (res.status === 202) {
+                            this.toast('Email ini sudah terdaftar lewat Google. Cek inbox untuk mengaktifkan login dengan password.', 'success');
+                            this.authLoading = false;
+                            this.view = 'home';
+                            return;
+                        }
+                        if (!res.ok) throw new Error(data.error || 'Gagal mendaftar');
+                        this.setSession(data.access_token, data.refresh_token, email);
+                        this.toast('Akun berhasil dibuat!');
+                        this.afterAuthSuccess();
+                    } catch (e) {
+                        this.toast(e.message || 'Gagal mendaftar', 'error');
+                    } finally {
+                        this.authLoading = false;
+                    }
+                },
                 async logout() {
-    try {
-        if (this.refreshToken) {
-            await fetch(BASE_URL + '/api/auth/logout', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ refresh_token: this.refreshToken })
-            });
-        }
-    } catch (e) {}
-    this.clearSession();
-    this.recentPublic = [];
-    this.notes = [];
-    this.menuOpen = false;
-    this.toast('Berhasil keluar');
-    this.view = 'home';
-},
+                    try {
+                        if (this.refreshToken) {
+                            await fetch(BASE_URL + '/api/auth/logout', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ refresh_token: this.refreshToken })
+                            });
+                        }
+                    } catch (e) {}
+                    this.clearSession();
+                    this.recentPublic = [];
+                    this.notes = [];
+                    this.menuOpen = false;
+                    this.toast('Berhasil keluar');
+                    this.view = 'home';
+                },
                 toggleDark() { this.darkMode = !this.darkMode; localStorage.setItem('notepad-theme', this.darkMode ? 'dark' : 'light'); },
                 toast(msg, type = 'success') { this.toastMsg = msg; this.toastType = type; clearTimeout(this._toastTimer); this._toastTimer = setTimeout(() => this.toastMsg = '', 3000); },
+                loginWithGoogle() {
+                    this.googleLoading = true;
+                    window.location.href = BASE_URL + '/api/auth/google/login';
+                    setTimeout(() => {
+                        this.googleLoading = false;
+                        this.toast('Gagal terhubung ke Google, coba lagi', 'error');
+                    }, 10000);
+                },
                 timeAgo(dateStr) { return dayjs(dateStr).fromNow(); },
                 shareUrl(id) { return FRONTEND_URL + '/n/' + id; },
                 copyToClipboard(text) { if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => this.toast('Link disalin!')).catch(() => this.toast('Gagal menyalin', 'error')); } else { const input = document.createElement('input'); input.value = text; document.body.appendChild(input); input.select(); try { document.execCommand('copy'); this.toast('Link disalin!'); } catch (e) { this.toast('Gagal menyalin', 'error'); } document.body.removeChild(input); } },
@@ -2327,9 +2465,15 @@ this.userEmail = localStorage.getItem(EMAIL_KEY) || '';
                         const data = await res.json();
                         if (!res.ok) throw new Error(data.error);
                         this.recentPublic = (data.notes || []).filter(n => n.mode === 'public');
+                        // ambil konten untuk 4 catatan pertama, jangan sampai error menghentikan seluruhnya
                         for (let n of this.recentPublic.slice(0, 4)) {
-                            try { const r2 = await fetch(`${API}/${n.id}`); const d2 = await r2.json(); n.content = d2.content || ''; }
-                            catch (e) { n.content = ''; }
+                            try {
+                                const r2 = await fetch(`${API}/${n.id}`);
+                                const d2 = await r2.json();
+                                n.content = d2.content || '';
+                            } catch (e) {
+                                n.content = 'Gagal memuat isi catatan';
+                            }
                         }
                     } catch (e) {
                         this.recentPublic = [];
@@ -2381,6 +2525,23 @@ this.userEmail = localStorage.getItem(EMAIL_KEY) || '';
                 handleShareLink() {
                     const match = window.location.pathname.match(/\/n\/([a-zA-Z0-9]+)(?:\/|$)/);
                     if (match) { this.viewNote(match[1]); return true; }
+                    return false;
+                },
+                handleAuthCallback() {
+                    if (window.location.pathname.endsWith('/auth/callback')) {
+                        this.fetchMe()
+                            .then(() => {
+                                this.toast('Berhasil masuk dengan Google!', 'success');
+                                window.history.replaceState(null, '', '/');
+                                this.view = 'home';
+                                this.fetchRecentPublic();
+                            })
+                            .catch(() => {
+                                this.toast('Gagal mengambil data akun', 'error');
+                                this.view = 'login';
+                            });
+                        return true;
+                    }
                     return false;
                 }
             };
