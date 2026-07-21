@@ -4,18 +4,20 @@
   <meta charset="utf-8" />
   <title>Notepad Sharing</title>
   <script>
-    // GitHub Pages SPA redirect trick.
-    // GitHub Pages serves this file for any unknown path (e.g. /notepad_frontend/n/abc123).
-    // We encode the real path into the querystring and redirect to index.html,
-    // then a small script in index.html restores it before Alpine's handleShareLink() runs.
+    (function() {
+      var loc = window.location;
 
-    var repoPath = '/notepad_frontend'; // <-- ganti kalau nama repo kamu beda
-    var loc = window.location;
-    var path = loc.pathname.slice(repoPath.length); // sisa path setelah nama repo, misal "/n/abc123"
+      // Jika URL sudah mengandung parameter redirect, jangan diproses lagi
+      if (loc.search.includes('redirect=')) {
+        // Pertahankan search & hash, cukup arahkan ke root
+        loc.replace('/' + loc.search + loc.hash);
+        return;
+      }
 
-    loc.replace(
-      repoPath + '/?redirect=' + encodeURIComponent(path + loc.search) + loc.hash
-    );
+      // Untuk path biasa (misal /n/abc123), encode sebagai redirect
+      var path = loc.pathname;
+      loc.replace('/?redirect=' + encodeURIComponent(path + loc.search) + loc.hash);
+    })();
   </script>
 </head>
 <body>
