@@ -14,12 +14,12 @@
     <link rel="apple-touch-icon" href="icons/icon-192.png" />
     <title>Notepad Sharing — Share Notes Instantly</title>
   <script>
-  // Pulihkan path asli dari redirect 404.html (GitHub Pages SPA trick)
+  
   (function () {
     var params = new URLSearchParams(window.location.search);
     var redirect = params.get('redirect');
     if (redirect) {
-      var repoPath = '/notepad_frontend'; // <-- samakan dengan di 404.html
+      var repoPath = '/notepad_frontend';
       var newUrl = repoPath + redirect;
       window.history.replaceState(null, '', newUrl);
     }
@@ -1676,7 +1676,7 @@
         </div>
     </header>
 
-
+    
 
     <main class="page">
         <!-- Transisi diterapkan ke setiap section dengan x-transition kustom -->
@@ -2201,7 +2201,7 @@
         const EMAIL_KEY = 'np_email';
 
         function notepadApp() {
-            const BASE_URL = 'https://notepad-sharing-production.up.railway.app'; // untuk API
+            const BASE_URL = 'http://binery.my.id/'; // untuk API
           const FRONTEND_URL = 'https://pratama20747.github.io/notepad_frontend'; // untuk share link
             const API = BASE_URL + '/api/notes';
             return {
@@ -2335,7 +2335,7 @@
                     }
                     return res;
                 },
-
+                
                 requireLogin() { this.clearSession(); this.toast('Masuk dulu untuk melanjutkan', 'error'); this.view = 'login'; },
                 goLogin(redirectView = null) { this.authRedirectView = redirectView; this.loginForm = { email: '', password: '' }; this.view = 'login'; },
                 goRegister(redirectView = null) { this.authRedirectView = redirectView; this.registerForm = { email: '', password: '', confirm: '' }; this.view = 'register'; },
@@ -2343,7 +2343,7 @@
                 afterAuthSuccess() { const target = this.authRedirectView || 'home'; this.authRedirectView = null; this.view = target; if (target === 'home') this.fetchRecentPublic(); if (target === 'list' || target === 'share') this.fetchList(); },
                 async submitLogin() {
                     const email = this.loginForm.email.trim();
-                    const password = this.loginForm.password;
+                    const password = this.loginForm.password; 
                     if (!email || !password) return this.toast('Isi email dan password terlebih dahulu', 'error');
                     this.authLoading = true;
                     let data;
@@ -2523,7 +2523,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/notepad_frontend/sw.js').catch(err => console.warn('SW register failed', err));
+                navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW register failed', err));
             });
         }
     </script>
