@@ -13,20 +13,9 @@
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
     <link rel="apple-touch-icon" href="icons/icon-192.png" />
     <title>Notepad Sharing — Share Notes Instantly</title>
-  <script>
-  
-  (function () {
-    var params = new URLSearchParams(window.location.search);
-    var redirect = params.get('redirect');
-    if (redirect) {
-      var repoPath = '/notepad_frontend';
-      var newUrl = repoPath + redirect;
-      window.history.replaceState(null, '', newUrl);
-    }
-  })();
-</script>
+
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js">
-    </script>
+    </scrip>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js">
     </script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/plugin/relativeTime.js">
@@ -2201,8 +2190,8 @@
         const EMAIL_KEY = 'np_email';
 
         function notepadApp() {
-            const BASE_URL = 'http://binery.my.id/'; // untuk API
-          const FRONTEND_URL = 'https://pratama20747.github.io/notepad_frontend'; // untuk share link
+            const BASE_URL = 'https://api.binery.my.id/'; // untuk API
+          const FRONTEND_URL = 'https://binery.my.id'; // untuk share link
             const API = BASE_URL + '/api/notes';
             return {
                 view: 'home',
