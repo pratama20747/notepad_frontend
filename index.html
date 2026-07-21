@@ -2232,53 +2232,83 @@
                 get isAuthed() { return !!this.accessToken; },
 
                 async init() {
-                    // === PERBAIKAN UTAMA: init tidak akan stuck ===
-                    clearTimeout(this._splashTimer); // bersihkan timer sebelumnya
-                    const finishSplash = () => {
-                        this.initialProgress = 100;
-                        // fallback: hilangkan splash paling lambat 1 detik setelah selesai
-                        clearTimeout(this._splashTimer);
-                        this._splashTimer = setTimeout(() => {
-                            this.initialLoading = false;
-                        }, 500);
-                    };
+    clearTimeout(this._splashTimer);
+    const finishSplash = () => {
+        this.initialProgress = 100;
+        clearTimeout(this._splashTimer);
+        this._splashTimer = setTimeout(() => {
+            this.initialLoading = false;
+        }, 500);
+    };
 
-                    try {
-                        this.initialProgress = 20;
-                        const saved = localStorage.getItem('notepad-theme');
-                        this.darkMode = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    try {
+        this.initialProgress = 20;
+        const saved = localStorage.getItem('notepad-theme');
+        this.darkMode = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-                        try {
-                            this.accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
-                            this.userEmail = localStorage.getItem(EMAIL_KEY) || '';
-                        } catch (storageError) {
-                            console.warn('localStorage tidak tersedia:', storageError);
-                        }
+        try {
+            this.accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+            this.userEmail = localStorage.getItem(EMAIL_KEY) || '';
+        } catch (e) {}
 
-                        this.initialProgress = 45;
-                        if (!this.accessToken) await this.silentRefresh();
-                        this.initialProgress = 70;
+        this.initialProgress = 45;
+        if (!this.accessToken) await this.silentRefresh();
+        this.initialProgress = 70;
 
-                        if (this.handleShareLink()) {
-                            finishSplash();
-                            return;
-                        }
-                        if (this.handleAuthCallback()) {
-                            finishSplash();
-                            return;
-                        }
-                        if (this.view === 'home') await this.fetchRecentPublic();
-                        finishSplash();
-                    } catch (e) {
-                        console.error('Gagal inisialisasi:', e);
-                        this.initialProgress = 100;
-                        this.toast('Terjadi masalah saat memuat data', 'error');
-                        // fallback tetap hilangkan splash
-                        this._splashTimer = setTimeout(() => {
-                            this.initialLoading = false;
-                        }, 800);
-                    }
-                },
+        // Cek share link
+        if (this.handleShareLink()) {
+            finishSplash();
+            return;
+        }
+
+        // === OPSI 2: Tangani callback Google langsung di frontend ===
+        if (window.location.pathname.startsWith('/api/auth/google/callback')) {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('code');
+            const state = params.get('state');
+            if (code && state) {
+                try {
+                    const res = await fetch(BASE_URL + '/api/auth/google/callback', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ code, state })
+                    });
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error || 'Gagal login Google');
+                    this.setSession(data.access_token, data.email);
+                    this.toast('Berhasil masuk dengan Google!', 'success');
+                    window.history.replaceState(null, '', '/');
+                    this.view = 'home';
+                    await this.fetchRecentPublic();
+                } catch (e) {
+                    this.toast(e.message, 'error');
+                    window.history.replaceState(null, '', '/login');
+                    this.view = 'login';
+                }
+            } else {
+                this.toast('Parameter callback tidak lengkap', 'error');
+                window.history.replaceState(null, '', '/login');
+                this.view = 'login';
+            }
+            finishSplash();
+            return;
+        }
+
+        // Fallback: jika backend redirect ke /auth/callback (tidak digunakan di Opsi 2)
+        if (this.handleAuthCallback()) {
+            finishSplash();
+            return;
+        }
+
+        // Normal load
+        if (this.view === 'home') await this.fetchRecentPublic();
+        finishSplash();
+    } catch (e) {
+        console.error('Init error:', e);
+        this.toast('Terjadi masalah saat memuat data', 'error');
+        finishSplash();
+    }
+},
                 setSession(accessToken, email) {
     this.accessToken = accessToken;
     localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
