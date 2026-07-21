@@ -10,7 +10,7 @@
       // Jika URL sudah mengandung parameter redirect, jangan diproses lagi
       if (loc.search.includes('redirect=')) {
         // Pertahankan search & hash, cukup arahkan ke root
-        loc.replace('/' + loc.search + loc.hash);
+        loc.replace(loc.search + loc.hash);
         return;
       }
 
