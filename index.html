@@ -2407,7 +2407,7 @@
                 toast(msg, type = 'success') { this.toastMsg = msg; this.toastType = type; clearTimeout(this._toastTimer); this._toastTimer = setTimeout(() => this.toastMsg = '', 3000); },
                 loginWithGoogle() {
                     this.googleLoading = true;
-                    window.location.href = BASE_URL + '/api/auth/google/login';
+                    window.location.href = BASE_URL + 'api/auth/google/login';
                     setTimeout(() => {
                         this.googleLoading = false;
                         this.toast('Gagal terhubung ke Google, coba lagi', 'error');
