@@ -207,7 +207,6 @@
 
         @supports (backdrop-filter: blur(1px)) {
             .topbar,
-            .icon-btn,
             .key-search,
             .note-card,
             .share-icon-btn,
@@ -2190,7 +2189,7 @@
         const EMAIL_KEY = 'np_email';
 
         function notepadApp() {
-            const BASE_URL = 'https://api.binery.my.id/'; // untuk API
+            const BASE_URL = 'https://api.binery.my.id'; // untuk API (tanpa trailing slash)
           const FRONTEND_URL = 'https://binery.my.id'; // untuk share link
             const API = BASE_URL + '/api/notes';
             return {
@@ -2261,41 +2260,37 @@
             return;
         }
 
-        // === OPSI 2: Tangani callback Google langsung di frontend ===
-        if (window.location.pathname.startsWith('/api/auth/google/callback')) {
-            const params = new URLSearchParams(window.location.search);
-            const code = params.get('code');
-            const state = params.get('state');
-            if (code && state) {
-                try {
-                    const res = await fetch(BASE_URL + '/api/auth/google/callback', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ code, state })
-                    });
-                    const data = await res.json();
-                    if (!res.ok) throw new Error(data.error || 'Gagal login Google');
-                    this.setSession(data.access_token, data.email);
-                    this.toast('Berhasil masuk dengan Google!', 'success');
-                    window.history.replaceState(null, '', '/');
+        // ===== TANGANI CALLBACK GOOGLE (backend redirect dgn ?login=google_success) =====
+        const urlParams = new URLSearchParams(window.location.search);
+        const loginStatus = urlParams.get('login');
+
+        if (loginStatus === 'google_success') {
+            console.log('🔄 Google callback detected, refreshing token...');
+            try {
+                const accessToken = await this.silentRefresh();
+                if (accessToken) {
+                    this.toast('Berhasil masuk dengan Google! 🎉', 'success');
                     this.view = 'home';
                     await this.fetchRecentPublic();
-                } catch (e) {
-                    this.toast(e.message, 'error');
-                    window.history.replaceState(null, '', '/login');
-                    this.view = 'login';
+                } else {
+                    throw new Error('No token received');
                 }
-            } else {
-                this.toast('Parameter callback tidak lengkap', 'error');
-                window.history.replaceState(null, '', '/login');
+            } catch (e) {
+                console.error('Google callback error:', e);
+                this.toast('Gagal login dengan Google. Silakan coba lagi.', 'error');
                 this.view = 'login';
+            } finally {
+                // Selalu bersihkan query param dari URL, sukses maupun gagal
+                window.history.replaceState(null, '', '/');
             }
             finishSplash();
             return;
         }
 
-        // Fallback: jika backend redirect ke /auth/callback (tidak digunakan di Opsi 2)
-        if (this.handleAuthCallback()) {
+        if (loginStatus === 'google_failed') {
+            this.toast('Login dengan Google gagal atau dibatalkan.', 'error');
+            window.history.replaceState(null, '', '/');
+            this.view = 'login';
             finishSplash();
             return;
         }
@@ -2370,6 +2365,7 @@
                         const res = await fetch(BASE_URL + '/api/auth/login', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include', // WAJIB: agar cookie refresh_token dari backend tersimpan
                             body: JSON.stringify({ email, password })
                         });
                         data = await res.json();
@@ -2400,6 +2396,7 @@
                         const res = await fetch(BASE_URL + '/api/auth/register', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include', // WAJIB: agar cookie refresh_token dari backend tersimpan
                             body: JSON.stringify({ email, password })
                         });
                         data = await res.json();
@@ -2437,7 +2434,7 @@
                 toast(msg, type = 'success') { this.toastMsg = msg; this.toastType = type; clearTimeout(this._toastTimer); this._toastTimer = setTimeout(() => this.toastMsg = '', 3000); },
                 loginWithGoogle() {
                     this.googleLoading = true;
-                    window.location.href = BASE_URL + 'api/auth/google/login';
+                    window.location.href = BASE_URL + '/api/auth/google/login';
                     setTimeout(() => {
                         this.googleLoading = false;
                         this.toast('Gagal terhubung ke Google, coba lagi', 'error');
@@ -2517,25 +2514,7 @@
                     const match = window.location.pathname.match(/\/n\/([a-zA-Z0-9]+)(?:\/|$)/);
                     if (match) { this.viewNote(match[1]); return true; }
                     return false;
-                },
-                handleAuthCallback() {
-    if (window.location.pathname.endsWith('/auth/callback')) {
-        this.silentRefresh()
-            .then(accessToken => {
-                if (!accessToken) throw new Error('No token');
-                this.toast('Berhasil masuk dengan Google!', 'success');
-                window.history.replaceState(null, '', '/');
-                this.view = 'home';
-                this.fetchRecentPublic();
-            })
-            .catch(() => {
-                this.toast('Gagal mengambil data akun', 'error');
-                this.view = 'login';
-            });
-        return true;
-    }
-    return false;
-}
+                }
             };
         }
     </script>
