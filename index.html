@@ -1618,6 +1618,203 @@
       @keyframes spin {
           to { transform: rotate(360deg); }
       }
+
+      /* ===== Avatar ===== */
+      .avatar-img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          object-fit: cover;
+          display: block;
+      }
+      .profile-avatar { overflow: hidden; position: relative; }
+      .avatar-edit-btn {
+          position: absolute;
+          bottom: -2px;
+          right: -2px;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, var(--blue) 0%, #6c5ce7 100%);
+          color: white;
+          border: 3px solid var(--card-solid);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: var(--shadow);
+      }
+      .avatar-edit-btn:hover { transform: scale(1.08); }
+      .account-chip .avatar-sm { overflow: hidden; }
+      .account-chip .avatar-sm img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+      /* ===== Cropper Modal ===== */
+      .cropper-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 400;
+          background: rgba(10, 12, 24, 0.6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+      }
+      .cropper-card {
+          background: var(--card-solid);
+          border-radius: var(--radius-xl);
+          padding: 22px;
+          max-width: 420px;
+          width: 100%;
+          box-shadow: var(--shadow-xl);
+      }
+      .cropper-title {
+          font-size: 17px;
+          font-weight: 750;
+          letter-spacing: -0.02em;
+          margin-bottom: 14px;
+          text-align: center;
+      }
+      .cropper-stage {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 1/1;
+          border-radius: var(--radius);
+          overflow: hidden;
+          background: var(--bg);
+          touch-action: none;
+          cursor: grab;
+          border: 1.5px solid var(--border);
+      }
+      .cropper-stage:active { cursor: grabbing; }
+      .cropper-stage img {
+          position: absolute;
+          top: 0;
+          left: 0;
+          transform-origin: 0 0;
+          user-select: none;
+          pointer-events: none;
+          -webkit-user-drag: none;
+      }
+      .cropper-mask {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          box-shadow: 0 0 0 2000px rgba(0,0,0,0.45);
+          border-radius: 50%;
+          border: 2px solid rgba(255,255,255,0.85);
+      }
+      .cropper-zoom-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-top: 16px;
+      }
+      .cropper-zoom-row input[type="range"] { flex: 1; accent-color: var(--blue); }
+      .cropper-canvas-hidden { display: none; }
+
+      /* ===== Note Photos ===== */
+      .note-photo-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+          gap: 8px;
+          margin-top: 10px;
+      }
+      .note-photo-thumb {
+          position: relative;
+          aspect-ratio: 1/1;
+          border-radius: var(--radius-sm);
+          overflow: hidden;
+          border: 1.5px solid var(--border);
+          background: var(--bg);
+      }
+      .note-photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .note-photo-thumb .remove-photo {
+          position: absolute;
+          top: 4px;
+          right: 4px;
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          background: rgba(20, 20, 30, 0.65);
+          color: white;
+          border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+      }
+      .note-photo-thumb .upload-spin-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0,0,0,0.35);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+      .note-photo-add-btn {
+          aspect-ratio: 1/1;
+          border-radius: var(--radius-sm);
+          border: 1.5px dashed var(--border);
+          background: var(--bg);
+          color: var(--text-muted);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          font-size: 11px;
+          font-weight: 650;
+          cursor: pointer;
+      }
+      .note-photo-add-btn:hover { border-color: var(--blue); color: var(--blue); }
+      .note-view-photos {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+          gap: 10px;
+          margin-top: 14px;
+      }
+      .note-view-photos img {
+          width: 100%;
+          aspect-ratio: 1/1;
+          object-fit: cover;
+          border-radius: var(--radius-sm);
+          border: 1.5px solid var(--border);
+          cursor: pointer;
+      }
+      .note-card-photo-strip { display: flex; gap: 6px; margin-top: 10px; }
+      .note-card-photo-strip img {
+          width: 52px;
+          height: 52px;
+          object-fit: cover;
+          border-radius: 9px;
+          border: 1.5px solid var(--border);
+      }
+      .lightbox-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 450;
+          background: rgba(5,6,14,0.85);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 24px;
+      }
+      .lightbox-overlay img { max-width: 100%; max-height: 90vh; border-radius: var(--radius); box-shadow: var(--shadow-xl); }
+      .lightbox-close {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.12);
+          color: white;
+          border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+      }
     </style>
 </head>
 <body x-data="notepadApp()" x-init="init()" :class="{ 'dark': darkMode }">
@@ -1653,8 +1850,14 @@
         <a href="#" @click.prevent="menuOpen = false; view = 'credit'">Credit</a>
     </div>
     <div class="dropdown-footer" x-show="isAuthed">
-        <span class="dropdown-email" x-text="userEmail || 'Akun kamu'"></span>
-        <button class="btn btn-danger btn-block" @click="menuOpen = false; logout()" style="margin-top: 6px; border-radius: 8px;">Keluar</button>
+        <div class="account-chip" style="margin:0; padding:0; background:none; border:none;">
+            <span class="avatar-sm">
+                <img x-show="avatarUrl" :src="avatarUrl" alt="Avatar" />
+                <svg x-show="!avatarUrl" class="icon-svg small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </span>
+            <span class="dropdown-email" x-text="userEmail || 'Akun kamu'"></span>
+        </div>
+        <button class="btn btn-danger btn-block" @click="menuOpen = false; logout()" style="margin-top: 10px; border-radius: 8px;">Keluar</button>
     </div>
     <div class="dropdown-footer" x-show="!isAuthed">
         <button class="btn btn-primary btn-block" @click="menuOpen = false; goLogin()" style="border-radius: 8px;">Masuk</button>
@@ -1739,6 +1942,11 @@
                                 </div>
                                 <h3 class="note-card-title" x-text="n.title"></h3>
                                 <p class="note-card-excerpt" x-text="n.content?.length > 140 ? n.content.slice(0,140)+'…' : n.content"></p>
+                                <div class="note-card-photo-strip" x-show="n.photos && n.photos.length" x-init="fetchCardPhotos(n)">
+                                    <template x-for="(p, pi) in (n.photos || []).slice(0,3)" :key="'hp-'+pi">
+                                        <img :src="p.url" @click.stop="lightboxUrl = p.url" />
+                                    </template>
+                                </div>
                                 <div class="note-card-footer">
                                     <span style="display:flex; align-items:center; gap:4px;">
                                         <svg class="icon-svg small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -1814,10 +2022,28 @@
                         </button>
                     </div>
                     <textarea x-model="form.content" placeholder="Mulai tulis catatanmu di sini..." @keydown.ctrl.enter="createNote()"></textarea>
+
+                    <div class="field-label">Foto <span x-text="'(' + form.pendingPhotos.length + '/5)'" style="text-transform:none;font-weight:500;"></span></div>
+                    <input type="file" x-ref="createPhotoInput" accept="image/png,image/jpeg,image/webp" multiple style="display:none" @change="addPendingPhotos($event, 'form')" />
+                    <div class="note-photo-grid">
+                        <template x-for="(p, idx) in form.pendingPhotos" :key="'np-'+idx">
+                            <div class="note-photo-thumb">
+                                <img :src="p.previewUrl" />
+                                <button class="remove-photo" @click="removePendingPhoto('form', idx)">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                </button>
+                            </div>
+                        </template>
+                        <button type="button" class="note-photo-add-btn" x-show="form.pendingPhotos.length < 5" @click="$refs.createPhotoInput.click()">
+                            <svg class="icon-svg small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            Tambah
+                        </button>
+                    </div>
+
                     <div class="btn-group">
                         <button class="btn btn-primary" @click="createNote()" :disabled="saving" style="flex:1">
                             <svg class="icon-svg small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                            Buat Catatan
+                            <span x-text="saving ? 'Menyimpan...' : 'Buat Catatan'"></span>
                         </button>
                         <button class="btn btn-secondary" @click="view = 'list'; fetchList()">
                             <svg class="icon-svg small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
@@ -1831,6 +2057,14 @@
                             <span x-text="resultNote.mode==='public'?'Public':'Private'"></span>
                         </span>
                         <div class="field-label" x-text="resultNote.title" style="font-size:15px;text-transform:none;letter-spacing:-0.02em;font-weight:700;color:var(--text);"></div>
+                        <div x-show="uploadingPhotos" class="field-label" style="text-transform:none;display:flex;align-items:center;gap:6px;"><span class="section-loading-spin"></span> Mengunggah foto...</div>
+                        <div class="note-photo-grid" x-show="resultNote.photos && resultNote.photos.length">
+                            <template x-for="(p, idx) in (resultNote.photos || [])" :key="'rp-'+idx">
+                                <div class="note-photo-thumb">
+                                    <img :src="p.url || p.previewUrl" @click="lightboxUrl = (p.url || p.previewUrl)" />
+                                </div>
+                            </template>
+                        </div>
                         <div class="field-label">Link bagikan</div>
                         <div class="key-search" style="margin:0;">
                             <svg class="icon-svg small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
@@ -1907,6 +2141,11 @@
                             </button>
                         </div>
                         <h3 class="note-card-title" x-text="n.title" style="margin-top:6px;"></h3>
+                        <div class="note-card-photo-strip" x-show="n.photos && n.photos.length" x-init="n.mode === 'public' ? fetchCardPhotos(n) : null">
+                            <template x-for="(p, pi) in (n.photos || []).slice(0,3)" :key="'lp-'+pi">
+                                <img :src="p.url" @click.stop="lightboxUrl = p.url" />
+                            </template>
+                        </div>
                         <div class="note-card-footer">
                             <span style="display:flex; align-items:center; gap:4px;">
                                 <svg class="icon-svg small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -1962,6 +2201,14 @@
                         </div>
                     </div>
                     <div class="note-view-content" x-text="viewedNote.content"></div>
+                    <div x-show="loadingPhotos" class="field-label" style="text-transform:none;display:flex;align-items:center;gap:6px;margin-top:12px;"><span class="section-loading-spin"></span> Memuat foto...</div>
+                    <div class="note-view-photos" x-show="viewedPhotos.length">
+                        <template x-for="(p, idx) in viewedPhotos" :key="'vp-'+idx">
+                            <template x-if="p.url">
+                                <img :src="p.url" @click="lightboxUrl = p.url" />
+                            </template>
+                        </template>
+                    </div>
                     <div class="btn-group">
                         <button class="btn btn-secondary" @click="view = 'home'; fetchRecentPublic()">← Kembali</button>
                     </div>
@@ -1998,6 +2245,44 @@
                         <div class="field-label">Password (untuk verifikasi)</div>
                         <input type="password" x-model="editForm.password" placeholder="Masukkan password" />
                     </div>
+
+                    <div class="field-label">Foto <span x-text="'(' + (editForm.photos.length + editForm.pendingPhotos.length) + '/5)'" style="text-transform:none;font-weight:500;"></span></div>
+                    <input type="file" x-ref="editPhotoInput" accept="image/png,image/jpeg,image/webp" multiple style="display:none" @change="addPendingPhotos($event, 'editForm')" />
+                    <div class="note-photo-grid">
+                        <template x-for="(p, idx) in editForm.photos" :key="p.id">
+                            <div class="note-photo-thumb">
+                                <template x-if="p.url">
+                                    <img :src="p.url" @click="lightboxUrl = p.url" />
+                                </template>
+                                <template x-if="!p.url">
+                                    <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);" @click="unlockEditPhoto(p)">
+                                        <span x-show="!p.loading">
+                                            <svg class="icon-svg small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                        </span>
+                                        <span x-show="p.loading" class="section-loading-spin"></span>
+                                    </div>
+                                </template>
+                                <button class="remove-photo" @click="deleteExistingPhoto(p)">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                </button>
+                            </div>
+                        </template>
+                        <template x-for="(p, idx) in editForm.pendingPhotos" :key="'ep-'+idx">
+                            <div class="note-photo-thumb">
+                                <img :src="p.previewUrl" />
+                                <div class="upload-spin-overlay" x-show="p.uploading"><span class="section-loading-spin" style="border-color: rgba(255,255,255,0.4); border-top-color: white;"></span></div>
+                                <button class="remove-photo" @click="removePendingPhoto('editForm', idx)" x-show="!p.uploading">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                </button>
+                            </div>
+                        </template>
+                        <button type="button" class="note-photo-add-btn" x-show="(editForm.photos.length + editForm.pendingPhotos.length) < 5" @click="$refs.editPhotoInput.click()">
+                            <svg class="icon-svg small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            Tambah
+                        </button>
+                    </div>
+                    <p style="font-size:12px;color:var(--text-muted);margin-top:6px;" x-show="editingNote.mode === 'private'">Foto baru akan diunggah otomatis (butuh password di atas). Untuk lihat foto lama yang terkunci, klik ikon gembok.</p>
+
                     <div class="btn-group">
                         <button class="btn btn-primary" @click="saveEdit()">
                             <svg class="icon-svg small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -2099,8 +2384,13 @@
             <template x-if="isAuthed">
                 <div class="profile-card" x-transition>
                     <div class="profile-avatar">
-                        <svg class="icon-svg" style="width:32px;height:32px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <img x-show="avatarUrl" :src="avatarUrl" class="avatar-img" alt="Avatar" />
+                        <svg x-show="!avatarUrl" class="icon-svg" style="width:32px;height:32px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <button class="avatar-edit-btn" @click="openAvatarPicker()" aria-label="Ubah foto profil" title="Ubah foto profil">
+                            <svg class="icon-svg small" style="width:15px;height:15px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
                     </div>
+                    <input type="file" x-ref="avatarFileInput" accept="image/png,image/jpeg,image/webp" style="display:none" @change="onAvatarFileSelected($event)" />
                     <h3 x-text="userEmail || 'Akun kamu'"></h3>
                     <p>Akun kamu di Notepad Sharing. Setiap catatan yang kamu buat tersimpan di sini dan hanya bisa kamu kelola.</p>
                     <button class="btn btn-danger btn-block" style="margin-top:20px;border-radius:var(--radius-pill);" @click="logout()">
@@ -2169,6 +2459,46 @@
 
     <div class="toast" x-show="toastMsg" :class="toastType" x-text="toastMsg" x-transition style="pointer-events:none;"></div>
 
+    <!-- Cropper Avatar Modal -->
+    <div class="cropper-overlay" x-show="cropper.open" x-transition @click.self="closeAvatarCropper()">
+        <div class="cropper-card" @click.stop>
+            <div class="cropper-title">Atur Foto Profil</div>
+            <div class="cropper-stage"
+                 x-ref="cropperStage"
+                 @mousedown="cropperDragStart($event)"
+                 @mousemove="cropperDragMove($event)"
+                 @mouseup="cropperDragEnd()"
+                 @mouseleave="cropperDragEnd()"
+                 @touchstart="cropperDragStart($event)"
+                 @touchmove="cropperDragMove($event)"
+                 @touchend="cropperDragEnd()"
+                 @wheel.prevent="cropperWheelZoom($event)">
+                <img x-ref="cropperImg" :src="cropper.imgSrc"
+                     :style="'width:' + cropper.imgW * cropper.scale + 'px; height:' + cropper.imgH * cropper.scale + 'px; transform: translate(' + cropper.offsetX + 'px,' + cropper.offsetY + 'px);'" />
+                <div class="cropper-mask"></div>
+            </div>
+            <div class="cropper-zoom-row">
+                <svg class="icon-svg small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+                <input type="range" min="1" max="3" step="0.01" x-model.number="cropper.zoom" @input="cropperSetZoom(cropper.zoom)" />
+                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/><line x1="11" y1="8" x2="11" y2="14"/></svg>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary btn-block" @click="confirmAvatarCrop()" :disabled="cropper.uploading">
+                    <span x-text="cropper.uploading ? 'Mengunggah...' : 'Simpan Foto'"></span>
+                </button>
+                <button class="btn btn-secondary btn-block" @click="closeAvatarCropper()" :disabled="cropper.uploading">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox Foto Note -->
+    <div class="lightbox-overlay" x-show="lightboxUrl" x-transition @click.self="lightboxUrl = null">
+        <button class="lightbox-close" @click="lightboxUrl = null">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <img :src="lightboxUrl" alt="Foto" />
+    </div>
+
     <script>
         dayjs.extend(dayjs_plugin_relativeTime);
         dayjs.locale('id');
@@ -2204,23 +2534,35 @@
                 recentPublic: [],
                 notes: [],
                 listOffset: 0,
-                form: { title: '', content: '', mode: 'public', password: '' },
+                form: { title: '', content: '', mode: 'public', password: '', pendingPhotos: [] },
                 resultNote: null,
                 viewedNote: null,
+                viewedPhotos: [],
+                loadingPhotos: false,
+                uploadingPhotos: false,
                 lockedNote: null,
                 unlockPassword: '',
                 editingNote: null,
-                editForm: { title: '', content: '', password: '' },
+                editForm: { title: '', content: '', password: '', photos: [], pendingPhotos: [] },
                 noteIcons: noteIconSVGs,
                 sunSVG,
                 moonSVG,
                 accessToken: null,
                 userEmail: '',
+                avatarUrl: '',
                 authLoading: false,
                 googleLoading: false,
                 authRedirectView: null,
                 loginForm: { email: '', password: '' },
                 registerForm: { email: '', password: '', confirm: '' },
+                lightboxUrl: null,
+                _lastUnlockPassword: '',
+                cropper: {
+                    open: false, file: null, imgSrc: '', imgW: 0, imgH: 0,
+                    stageSize: 320, minScale: 1, scale: 1, zoom: 1,
+                    offsetX: 0, offsetY: 0, dragging: false, startX: 0, startY: 0,
+                    startOffsetX: 0, startOffsetY: 0, uploading: false, lastDist: null
+                },
 
                 // ===== state loading baru =====
                 initialLoading: true,
@@ -2252,6 +2594,7 @@
 
         this.initialProgress = 45;
         if (!this.accessToken) await this.silentRefresh();
+        if (this.isAuthed) this.fetchMe();
         this.initialProgress = 70;
 
         // Cek share link
@@ -2271,6 +2614,7 @@
                 if (accessToken) {
                     this.toast('Berhasil masuk dengan Google! 🎉', 'success');
                     this.view = 'home';
+                    this.fetchMe();
                     await this.fetchRecentPublic();
                 } else {
                     throw new Error('No token received');
@@ -2316,9 +2660,21 @@
                 clearSession() {
     this.accessToken = null;
     this.userEmail = '';
+    this.avatarUrl = '';
     localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(EMAIL_KEY);
     // tidak ada refresh token di localStorage
+},
+                async fetchMe() {
+    try {
+        const res = await this.authFetch(BASE_URL + '/api/auth/me');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        this.avatarUrl = data.avatar_url || '';
+        if (data.email) { this.userEmail = data.email; localStorage.setItem(EMAIL_KEY, data.email); }
+    } catch (e) {
+        // gagal ambil profil bukan error fatal, abaikan
+    }
 },
                 async silentRefresh() {
     try {
@@ -2354,7 +2710,7 @@
                 goLogin(redirectView = null) { this.authRedirectView = redirectView; this.loginForm = { email: '', password: '' }; this.view = 'login'; },
                 goRegister(redirectView = null) { this.authRedirectView = redirectView; this.registerForm = { email: '', password: '', confirm: '' }; this.view = 'register'; },
                 goProtected(targetView) { if (!this.isAuthed) { this.goLogin(targetView); return; } this.view = targetView; if (targetView === 'list' || targetView === 'share') this.fetchList(); },
-                afterAuthSuccess() { const target = this.authRedirectView || 'home'; this.authRedirectView = null; this.view = target; if (target === 'home') this.fetchRecentPublic(); if (target === 'list' || target === 'share') this.fetchList(); },
+                afterAuthSuccess() { const target = this.authRedirectView || 'home'; this.authRedirectView = null; this.view = target; this.fetchMe(); if (target === 'home') this.fetchRecentPublic(); if (target === 'list' || target === 'share') this.fetchList(); },
                 async submitLogin() {
                     const email = this.loginForm.email.trim();
                     const password = this.loginForm.password; 
@@ -2444,7 +2800,7 @@
                 shareUrl(id) { return FRONTEND_URL + '/n/' + id; },
                 copyToClipboard(text) { if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => this.toast('Link disalin!')).catch(() => this.toast('Gagal menyalin', 'error')); } else { const input = document.createElement('input'); input.value = text; document.body.appendChild(input); input.select(); try { document.execCommand('copy'); this.toast('Link disalin!'); } catch (e) { this.toast('Gagal menyalin', 'error'); } document.body.removeChild(input); } },
                 setMode(mode) { this.form.mode = mode; },
-                resetForm() { this.form = { title: '', content: '', mode: 'public', password: '' }; this.resultNote = null; this.showPassword = false; },
+                resetForm() { this.form.pendingPhotos.forEach(p => URL.revokeObjectURL(p.previewUrl)); this.form = { title: '', content: '', mode: 'public', password: '', pendingPhotos: [] }; this.resultNote = null; this.showPassword = false; this.uploadingPhotos = false; },
                 async fetchRecentPublic() {
                     if (!this.isAuthed) { this.recentPublic = []; return; }
                     this.loadingRecent = true;
@@ -2487,11 +2843,98 @@
                 },
                 nextPage() { this.listOffset += 20; this.fetchList(); },
                 prevPage() { this.listOffset = Math.max(0, this.listOffset - 20); this.fetchList(); },
-                async createNote() { if (!this.isAuthed) return this.goLogin('create'); if (!this.form.content.trim()) return this.toast('Isi catatan tidak boleh kosong', 'error'); if (this.form.mode === 'private' && this.form.password.length < 4) return this.toast('Password minimal 4 karakter', 'error'); this.saving = true; try { const payload = { mode: this.form.mode, title: this.form.title || 'Catatan tanpa judul', content: this.form.content }; if (this.form.mode === 'private') payload.password = this.form.password; const res = await this.authFetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); const data = await res.json(); if (!res.ok) throw new Error(data.error); this.resultNote = data; this.form.title = ''; this.form.content = ''; this.form.password = ''; this.toast('Catatan berhasil dibuat!'); } catch (e) { this.toast(e.message, 'error'); } finally { this.saving = false; } },
+                async createNote() {
+                    if (!this.isAuthed) return this.goLogin('create');
+                    if (!this.form.content.trim()) return this.toast('Isi catatan tidak boleh kosong', 'error');
+                    if (this.form.mode === 'private' && this.form.password.length < 4) return this.toast('Password minimal 4 karakter', 'error');
+                    this.saving = true;
+                    try {
+                        const payload = { mode: this.form.mode, title: this.form.title || 'Catatan tanpa judul', content: this.form.content };
+                        if (this.form.mode === 'private') payload.password = this.form.password;
+                        const res = await this.authFetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error);
+                        data.photos = [];
+                        this.resultNote = data;
+                        const pending = this.form.pendingPhotos;
+                        const mode = this.form.mode;
+                        const password = this.form.password;
+                        this.form.title = ''; this.form.content = ''; this.form.password = ''; this.form.pendingPhotos = [];
+                        this.toast('Catatan berhasil dibuat!');
+                        if (pending.length) {
+                            this.uploadingPhotos = true;
+                            for (const p of pending) {
+                                try {
+                                    const photo = await this.uploadNotePhoto(data.id, p.file, mode, password);
+                                    this.resultNote.photos.push({ ...photo, previewUrl: p.previewUrl });
+                                } catch (e) {
+                                    this.toast('Gagal unggah salah satu foto: ' + e.message, 'error');
+                                } finally {
+                                    URL.revokeObjectURL(p.previewUrl);
+                                }
+                            }
+                            this.uploadingPhotos = false;
+                        }
+                    } catch (e) {
+                        this.toast(e.message, 'error');
+                    } finally {
+                        this.saving = false;
+                    }
+                },
                 openByKey() { const key = this.searchKey.trim(); if (!key) return this.toast('Masukkan kode catatan', 'error'); this.viewNote(key); },
-                async viewNote(id) { this.view = 'view'; this.viewedNote = null; this.lockedNote = null; this.editingNote = null; try { const res = await fetch(`${API}/${id}`); const data = await res.json(); if (!res.ok) throw new Error(data.error); if (data.locked) { this.lockedNote = data; return; } this.viewedNote = data; } catch (e) { this.toast(e.message, 'error'); this.view = 'home'; } },
-                async unlockNote(id) { if (!this.unlockPassword) return this.toast('Masukkan password', 'error'); try { const res = await fetch(`${API}/${id}/unlock`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: this.unlockPassword }) }); const data = await res.json(); if (!res.ok) throw new Error(data.error); data.mode = 'private'; this.viewedNote = data; this.lockedNote = null; this.unlockPassword = ''; this.toast('Catatan terbuka!'); } catch (e) { this.toast(e.message, 'error'); } },
-                editNote(id) { const note = this.viewedNote; if (!note) return; this.editingNote = note; this.editForm = { title: note.title, content: note.content, password: '' }; this.viewedNote = null; },
+                async viewNote(id) {
+                    this.view = 'view'; this.viewedNote = null; this.lockedNote = null; this.editingNote = null; this.viewedPhotos = []; this._lastUnlockPassword = '';
+                    try {
+                        const res = await fetch(`${API}/${id}`);
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error);
+                        if (data.locked) { this.lockedNote = data; return; }
+                        this.viewedNote = data;
+                        this.loadNotePhotosForView(id, '');
+                    } catch (e) { this.toast(e.message, 'error'); this.view = 'home'; }
+                },
+                async unlockNote(id) {
+                    if (!this.unlockPassword) return this.toast('Masukkan password', 'error');
+                    const password = this.unlockPassword;
+                    try {
+                        const res = await fetch(`${API}/${id}/unlock`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error);
+                        data.mode = 'private';
+                        this.viewedNote = data;
+                        this.lockedNote = null;
+                        this.unlockPassword = '';
+                        this._lastUnlockPassword = password;
+                        this.toast('Catatan terbuka!');
+                        this.loadNotePhotosForView(id, password);
+                    } catch (e) { this.toast(e.message, 'error'); }
+                },
+                async loadNotePhotosForView(noteId, password) {
+                    this.viewedPhotos = [];
+                    this.loadingPhotos = true;
+                    try {
+                        const attachments = await this.fetchNotePhotos(noteId);
+                        for (const a of attachments) {
+                            if (!a.encrypted) { this.viewedPhotos.push({ id: a.id, url: a.url }); continue; }
+                            if (!password) { this.viewedPhotos.push({ id: a.id, url: null }); continue; }
+                            try {
+                                const url = await this.downloadPrivateAttachment(a.id, password);
+                                this.viewedPhotos.push({ id: a.id, url });
+                            } catch (e) { /* lewati foto yang gagal dibuka */ }
+                        }
+                    } catch (e) {
+                        // gagal memuat foto, note tetap tampil tanpa foto
+                    } finally {
+                        this.loadingPhotos = false;
+                    }
+                },
+                async editNote(id) {
+                    const note = this.viewedNote; if (!note) return;
+                    this.editingNote = note;
+                    this.editForm = { title: note.title, content: note.content, password: '', photos: [], pendingPhotos: [] };
+                    this.viewedNote = null;
+                    await this.loadEditFormPhotos(note.id);
+                },
                 async editNoteFromCard(id) {
                     if (!this.isAuthed) return this.goLogin('list');
                     try {
@@ -2500,20 +2943,296 @@
                         if (!res.ok) throw new Error(data.error);
                         if (data.locked) { this.viewNote(id); return; }
                         this.editingNote = data;
-                        this.editForm = { title: data.title, content: data.content, password: '' };
+                        this.editForm = { title: data.title, content: data.content, password: '', photos: [], pendingPhotos: [] };
                         this.viewedNote = null;
                         this.lockedNote = null;
                         this.view = 'view';
+                        await this.loadEditFormPhotos(id);
                     } catch (e) { this.toast(e.message, 'error'); }
                 },
-                cancelEdit() { if (this.editingNote) { this.viewNote(this.editingNote.id); } this.editingNote = null; },
-                async saveEdit() { const note = this.editingNote; if (!note) return; if (!this.editForm.content.trim()) return this.toast('Isi catatan tidak boleh kosong', 'error'); const payload = { title: this.editForm.title || 'Catatan tanpa judul', content: this.editForm.content }; if (note.mode === 'private') { if (!this.editForm.password) return this.toast('Masukkan password untuk verifikasi', 'error'); payload.password = this.editForm.password; } try { const res = await this.authFetch(`${API}/${note.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); const data = await res.json(); if (!res.ok) throw new Error(data.error); this.toast('Catatan berhasil diupdate!'); this.editingNote = null; this.viewNote(note.id); } catch (e) { this.toast(e.message, 'error'); } },
+                async loadEditFormPhotos(noteId) {
+                    try {
+                        const attachments = await this.fetchNotePhotos(noteId);
+                        this.editForm.photos = attachments.map(a => ({ id: a.id, url: a.encrypted ? null : a.url, encrypted: a.encrypted, loading: false }));
+                    } catch (e) { /* biarkan kosong jika gagal */ }
+                },
+                cancelEdit() {
+                    this.editForm.pendingPhotos.forEach(p => URL.revokeObjectURL(p.previewUrl));
+                    if (this.editingNote) { this.viewNote(this.editingNote.id); }
+                    this.editingNote = null;
+                },
+                async unlockEditPhoto(photo) {
+                    if (photo.url || photo.loading) return;
+                    const password = this.editForm.password || prompt('Masukkan password note untuk membuka foto ini:');
+                    if (!password) return;
+                    photo.loading = true;
+                    try {
+                        photo.url = await this.downloadPrivateAttachment(photo.id, password);
+                    } catch (e) { this.toast(e.message, 'error'); }
+                    photo.loading = false;
+                },
+                async deleteExistingPhoto(photo) {
+                    if (!confirm('Hapus foto ini?')) return;
+                    const note = this.editingNote;
+                    let password = null;
+                    if (note && note.mode === 'private') {
+                        password = this.editForm.password || prompt('Masukkan password note untuk hapus foto:');
+                        if (!password) return;
+                    }
+                    try {
+                        const res = await this.authFetch(`${API}/attachments/${photo.id}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(password ? { password } : {}) });
+                        if (!res.ok) throw new Error((await res.json()).error);
+                        this.editForm.photos = this.editForm.photos.filter(p => p.id !== photo.id);
+                        this.toast('Foto berhasil dihapus');
+                    } catch (e) { this.toast(e.message, 'error'); }
+                },
+                async saveEdit() {
+                    const note = this.editingNote; if (!note) return;
+                    if (!this.editForm.content.trim()) return this.toast('Isi catatan tidak boleh kosong', 'error');
+                    const payload = { title: this.editForm.title || 'Catatan tanpa judul', content: this.editForm.content };
+                    if (note.mode === 'private') {
+                        if (!this.editForm.password) return this.toast('Masukkan password untuk verifikasi', 'error');
+                        payload.password = this.editForm.password;
+                    }
+                    const totalPhotos = this.editForm.photos.length + this.editForm.pendingPhotos.length;
+                    if (totalPhotos > 5) return this.toast('Maksimal 5 foto per catatan', 'error');
+                    try {
+                        const res = await this.authFetch(`${API}/${note.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error);
+                        const pending = this.editForm.pendingPhotos;
+                        if (pending.length) {
+                            for (const p of pending) {
+                                p.uploading = true;
+                                try {
+                                    await this.uploadNotePhoto(note.id, p.file, note.mode, this.editForm.password);
+                                } catch (e) {
+                                    this.toast('Gagal unggah salah satu foto: ' + e.message, 'error');
+                                } finally {
+                                    URL.revokeObjectURL(p.previewUrl);
+                                }
+                            }
+                        }
+                        this.toast('Catatan berhasil diupdate!');
+                        this.editingNote = null;
+                        this.viewNote(note.id);
+                    } catch (e) { this.toast(e.message, 'error'); }
+                },
                 async deleteNote(id) { if (!confirm('Yakin ingin menghapus catatan ini?')) return; let password = null; try { const res = await fetch(`${API}/${id}`); const data = await res.json(); if (data.locked || data.mode === 'private') { password = prompt('Masukkan password untuk menghapus:'); if (!password) return; } } catch (e) { return this.toast(e.message, 'error'); } try { const res = await this.authFetch(`${API}/${id}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(password ? { password } : {}) }); if (!res.ok) throw new Error((await res.json()).error); this.toast('Catatan berhasil dihapus'); if (this.view === 'list' || this.view === 'share') { this.fetchList(); } else { this.view = 'home'; this.fetchRecentPublic(); } } catch (e) { this.toast(e.message, 'error'); } },
                 shareNote(id) { const url = this.shareUrl(id); if (navigator.share) { navigator.share({ title: 'Notepad Sharing', url }).catch(() => {}); } else { this.copyToClipboard(url); } },
                 handleShareLink() {
                     const match = window.location.pathname.match(/\/n\/([a-zA-Z0-9]+)(?:\/|$)/);
                     if (match) { this.viewNote(match[1]); return true; }
                     return false;
+                },
+
+                // ===================== FOTO NOTE =====================
+                async fetchNotePhotos(noteId) {
+                    const res = await fetch(`${API}/${noteId}/attachments`);
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error || 'Gagal memuat foto');
+                    return (data.attachments || []).filter(a => a.kind === 'image');
+                },
+                async fetchCardPhotos(n) {
+                    if (n.photos !== undefined) return;
+                    n.photos = [];
+                    try {
+                        const attachments = await this.fetchNotePhotos(n.id);
+                        n.photos = attachments.filter(a => !a.encrypted && a.url).map(a => ({ id: a.id, url: a.url }));
+                    } catch (e) { /* biarkan strip kosong jika gagal */ }
+                },
+                async downloadPrivateAttachment(attachmentId, password) {
+                    const res = await fetch(`${API}/attachments/${attachmentId}/download`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password })
+                    });
+                    if (!res.ok) {
+                        let msg = 'Gagal membuka foto';
+                        try { msg = (await res.json()).error || msg; } catch (e) {}
+                        throw new Error(msg);
+                    }
+                    const blob = await res.blob();
+                    return URL.createObjectURL(blob);
+                },
+                async uploadNotePhoto(noteId, file, mode, password) {
+                    if (mode === 'private') {
+                        const fd = new FormData();
+                        fd.append('file', file);
+                        fd.append('kind', 'image');
+                        fd.append('password', password || '');
+                        const res = await this.authFetch(`${API}/${noteId}/attachments/private`, { method: 'POST', body: fd });
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error || 'Gagal unggah foto');
+                        return { id: data.id, kind: data.kind, content_type: data.content_type, file_size: data.file_size, url: null, encrypted: true };
+                    }
+                    const presignRes = await this.authFetch(`${API}/${noteId}/attachments/presign`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ content_type: file.type, file_size: file.size, kind: 'image' })
+                    });
+                    const presignData = await presignRes.json();
+                    if (!presignRes.ok) throw new Error(presignData.error || 'Gagal presign upload');
+                    const putRes = await fetch(presignData.upload_url, { method: 'PUT', headers: { 'Content-Type': file.type }, body: file });
+                    if (!putRes.ok) throw new Error('Gagal mengunggah file ke storage');
+                    const confirmRes = await this.authFetch(`${API}/${noteId}/attachments/confirm`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ key: presignData.key, kind: 'image' })
+                    });
+                    const confirmData = await confirmRes.json();
+                    if (!confirmRes.ok) throw new Error(confirmData.error || 'Gagal konfirmasi upload');
+                    return { id: confirmData.id, kind: confirmData.kind, content_type: confirmData.content_type, file_size: confirmData.file_size, url: confirmData.url, encrypted: false };
+                },
+                addPendingPhotos(event, targetKey) {
+                    const target = targetKey === 'editForm' ? this.editForm : this.form;
+                    const existingCount = (target.photos ? target.photos.length : 0) + target.pendingPhotos.length;
+                    const files = Array.from(event.target.files || []);
+                    event.target.value = '';
+                    const room = 5 - existingCount;
+                    if (room <= 0) { this.toast('Maksimal 5 foto per catatan', 'error'); return; }
+                    const toAdd = files.slice(0, room);
+                    if (files.length > toAdd.length) this.toast('Hanya ' + toAdd.length + ' foto ditambahkan (maks 5 per catatan)', 'error');
+                    for (const file of toAdd) {
+                        if (!file.type.startsWith('image/')) { this.toast(file.name + ' bukan file gambar', 'error'); continue; }
+                        if (file.size > 10 * 1024 * 1024) { this.toast(file.name + ' melebihi 10MB', 'error'); continue; }
+                        target.pendingPhotos.push({ file, previewUrl: URL.createObjectURL(file), uploading: false });
+                    }
+                },
+                removePendingPhoto(targetKey, idx) {
+                    const target = targetKey === 'editForm' ? this.editForm : this.form;
+                    const [removed] = target.pendingPhotos.splice(idx, 1);
+                    if (removed) URL.revokeObjectURL(removed.previewUrl);
+                },
+
+                // ===================== AVATAR CROPPER =====================
+                openAvatarPicker() { this.$refs.avatarFileInput.click(); },
+                onAvatarFileSelected(event) {
+                    const file = event.target.files[0];
+                    event.target.value = '';
+                    if (!file) return;
+                    if (!file.type.startsWith('image/')) return this.toast('File harus berupa gambar', 'error');
+                    if (file.size > 12 * 1024 * 1024) return this.toast('Ukuran file maksimal 12MB', 'error');
+                    const img = new Image();
+                    const src = URL.createObjectURL(file);
+                    img.onload = () => {
+                        this.cropper.file = file;
+                        this.cropper.imgSrc = src;
+                        this.cropper.imgW = img.naturalWidth;
+                        this.cropper.imgH = img.naturalHeight;
+                        this.cropper.open = true;
+                        this.$nextTick(() => {
+                            const stage = this.$refs.cropperStage;
+                            const size = stage ? stage.clientWidth : 320;
+                            this.cropper.stageSize = size;
+                            const minScale = Math.max(size / img.naturalWidth, size / img.naturalHeight);
+                            this.cropper.minScale = minScale;
+                            this.cropper.zoom = 1;
+                            this.cropper.scale = minScale;
+                            this.cropper.offsetX = (size - img.naturalWidth * minScale) / 2;
+                            this.cropper.offsetY = (size - img.naturalHeight * minScale) / 2;
+                        });
+                    };
+                    img.src = src;
+                },
+                cropperClampOffsets() {
+                    const c = this.cropper;
+                    const w = c.imgW * c.scale, h = c.imgH * c.scale;
+                    const minX = Math.min(0, c.stageSize - w), maxX = 0;
+                    const minY = Math.min(0, c.stageSize - h), maxY = 0;
+                    c.offsetX = Math.max(minX, Math.min(maxX, c.offsetX));
+                    c.offsetY = Math.max(minY, Math.min(maxY, c.offsetY));
+                },
+                cropperSetZoom(zoom) {
+                    const c = this.cropper;
+                    const oldScale = c.scale;
+                    const newScale = c.minScale * zoom;
+                    const centerX = c.stageSize / 2, centerY = c.stageSize / 2;
+                    const imgX = (centerX - c.offsetX) / oldScale;
+                    const imgY = (centerY - c.offsetY) / oldScale;
+                    c.scale = newScale;
+                    c.offsetX = centerX - imgX * newScale;
+                    c.offsetY = centerY - imgY * newScale;
+                    this.cropperClampOffsets();
+                },
+                cropperWheelZoom(event) {
+                    const delta = event.deltaY > 0 ? -0.08 : 0.08;
+                    this.cropper.zoom = Math.max(1, Math.min(3, this.cropper.zoom + delta));
+                    this.cropperSetZoom(this.cropper.zoom);
+                },
+                cropperEventPoint(event) {
+                    if (event.touches && event.touches.length) return { x: event.touches[0].clientX, y: event.touches[0].clientY };
+                    return { x: event.clientX, y: event.clientY };
+                },
+                cropperDragStart(event) {
+                    const pt = this.cropperEventPoint(event);
+                    this.cropper.dragging = true;
+                    this.cropper.startX = pt.x;
+                    this.cropper.startY = pt.y;
+                    this.cropper.startOffsetX = this.cropper.offsetX;
+                    this.cropper.startOffsetY = this.cropper.offsetY;
+                },
+                cropperDragMove(event) {
+                    if (!this.cropper.dragging) return;
+                    const pt = this.cropperEventPoint(event);
+                    this.cropper.offsetX = this.cropper.startOffsetX + (pt.x - this.cropper.startX);
+                    this.cropper.offsetY = this.cropper.startOffsetY + (pt.y - this.cropper.startY);
+                    this.cropperClampOffsets();
+                },
+                cropperDragEnd() { this.cropper.dragging = false; },
+                closeAvatarCropper() {
+                    if (this.cropper.imgSrc) URL.revokeObjectURL(this.cropper.imgSrc);
+                    this.cropper.open = false;
+                    this.cropper.file = null;
+                    this.cropper.imgSrc = '';
+                },
+                async confirmAvatarCrop() {
+                    const c = this.cropper;
+                    if (!c.file) return;
+                    c.uploading = true;
+                    try {
+                        const OUTPUT = 512;
+                        const canvas = document.createElement('canvas');
+                        canvas.width = OUTPUT; canvas.height = OUTPUT;
+                        const ctx = canvas.getContext('2d');
+                        const img = this.$refs.cropperImg;
+                        const sx = -c.offsetX / c.scale, sy = -c.offsetY / c.scale;
+                        const sSize = c.stageSize / c.scale;
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.arc(OUTPUT / 2, OUTPUT / 2, OUTPUT / 2, 0, Math.PI * 2);
+                        ctx.closePath();
+                        ctx.clip();
+                        ctx.drawImage(img, sx, sy, sSize, sSize, 0, 0, OUTPUT, OUTPUT);
+                        ctx.restore();
+                        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
+                        await this.uploadAvatar(blob);
+                        this.closeAvatarCropper();
+                    } catch (e) {
+                        this.toast('Gagal memproses foto: ' + e.message, 'error');
+                    } finally {
+                        c.uploading = false;
+                    }
+                },
+                async uploadAvatar(blob) {
+                    const presignRes = await this.authFetch(BASE_URL + '/api/users/avatar/presign', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ content_type: 'image/jpeg', file_size: blob.size })
+                    });
+                    const presignData = await presignRes.json();
+                    if (!presignRes.ok) throw new Error(presignData.error || 'Gagal presign avatar');
+                    const putRes = await fetch(presignData.upload_url, { method: 'PUT', headers: { 'Content-Type': 'image/jpeg' }, body: blob });
+                    if (!putRes.ok) throw new Error('Gagal mengunggah foto ke storage');
+                    const confirmRes = await this.authFetch(BASE_URL + '/api/users/avatar/confirm', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ key: presignData.key })
+                    });
+                    const confirmData = await confirmRes.json();
+                    if (!confirmRes.ok) throw new Error(confirmData.error || 'Gagal konfirmasi avatar');
+                    this.avatarUrl = confirmData.avatar_url || this.avatarUrl;
+                    this.toast('Foto profil berhasil diperbarui!');
                 }
             };
         }
