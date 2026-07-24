@@ -519,7 +519,20 @@
                 async deleteNote(id) { if (!confirm('Yakin ingin menghapus catatan ini?')) return; let password = null; try { const res = await fetch(`${API}/${id}`); const data = await res.json(); if (data.locked || data.mode === 'private') { password = prompt('Masukkan password untuk menghapus:'); if (!password) return; } } catch (e) { return this.toast(e.message, 'error'); } try { const res = await this.authFetch(`${API}/${id}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(password ? { password } : {}) }); if (!res.ok) throw new Error((await res.json()).error); this.toast('Catatan berhasil dihapus'); if (this.view === 'list' || this.view === 'share') { this.fetchList(); } else { this.view = 'home'; this.fetchRecentPublic(); } } catch (e) { this.toast(e.message, 'error'); } },
                 shareNote(id) { const url = this.shareUrl(id); if (navigator.share) { navigator.share({ title: 'Notepad Sharing', url }).catch(() => {}); } else { this.copyToClipboard(url); } },
                 handleShareLink() {
-                    const match = window.location.pathname.match(/\/n\/([a-zA-Z0-9]+)(?:\/|$)/);
+                    // Path normal (mis. saat sudah di path yang benar)
+                    let pathToCheck = window.location.pathname;
+
+                    // Fallback dari 404.html: GitHub Pages tidak punya file /n/xxx,
+                    // jadi 404.html redirect ke /?redirect=%2Fn%2Fxxx. Baca param itu
+                    // dan kembalikan URL ke path aslinya supaya link share tetap valid.
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const redirectPath = urlParams.get('redirect');
+                    if (redirectPath) {
+                        pathToCheck = redirectPath;
+                        window.history.replaceState(null, '', redirectPath);
+                    }
+
+                    const match = pathToCheck.match(/\/n\/([a-zA-Z0-9]+)(?:\/|$)/);
                     if (match) { this.viewNote(match[1]); return true; }
                     return false;
                 },

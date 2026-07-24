@@ -132,7 +132,7 @@
                             </template>
                         </template>
                         <template x-if="!loadingRecent && recentPublic.length === 0">
-                            <div class="empty-state">Belum ada catatan publik. Jadilah yang pertama ✨</div>
+                            <div class="empty-state">tidak ada catatan dalan akun mu!</div>
                         </template>
                         <template x-if="!loadingRecent">
                           <template x-for="(n, i) in recentPublic.slice(0,4)" :key="n.id">
@@ -320,7 +320,7 @@
                     </template>
                 </template>
                 <template x-if="!loadingList && notes.length === 0">
-                    <div class="empty-state">Belum ada catatan. Buat yang pertama ✍️</div>
+                    <div class="empty-state">Belum ada catatan</div>
                 </template>
                 <template x-if="!loadingList">
                   <template x-for="(n, i) in notes" :key="n.id">
